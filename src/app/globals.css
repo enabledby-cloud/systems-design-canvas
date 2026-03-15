@@ -1,0 +1,140 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0f172a;
+  --foreground: #e2e8f0;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar for the app */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #1e293b;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* Selection colors */
+::selection {
+  background: #6366f1;
+  color: #ffffff;
+}
+
+/* React Flow custom styles */
+.react-flow__node {
+  /* Remove default padding/bg so our custom node renders cleanly */
+  padding: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.react-flow__node-system {
+  background: transparent !important;
+}
+
+.react-flow__node-group,
+.react-flow__node-boundary {
+  background: transparent !important;
+  box-shadow: none !important;
+  pointer-events: none;
+}
+
+/* Allow handles on group/boundary nodes to be interactive */
+.react-flow__node-group .react-flow__handle,
+.react-flow__node-boundary .react-flow__handle {
+  pointer-events: all;
+}
+
+.react-flow__handle {
+  /* Make handles clickable */
+  pointer-events: all;
+}
+
+.react-flow__edge-path {
+  stroke: #475569;
+  stroke-width: 2;
+}
+
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: #818cf8;
+}
+
+.react-flow__edge:hover .react-flow__edge-path {
+  stroke: #818cf8;
+}
+
+.react-flow__connection-line {
+  stroke: #818cf8;
+  stroke-width: 2;
+  stroke-dasharray: 5 5;
+}
+
+/* Controls styling */
+.react-flow__controls {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important;
+}
+
+.react-flow__controls-button {
+  background: #1e293b !important;
+  border: none !important;
+  color: #94a3b8 !important;
+}
+
+.react-flow__controls-button:hover {
+  background: #334155 !important;
+  color: #e2e8f0 !important;
+}
+
+.react-flow__controls-button svg {
+  fill: currentColor !important;
+}
+
+/* MiniMap styling */
+.react-flow__minimap {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+  border-radius: 8px !important;
+}
+
+.react-flow__minimap-mask {
+  fill: rgba(15, 23, 42, 0.8) !important;
+}
+
+/* Attribution removal handled via proOptions */
+

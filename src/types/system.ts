@@ -76,34 +76,12 @@ export interface Point {
   y: number;
 }
 
-/** Canvas offset for panning */
-export interface CanvasOffset {
-  x: number;
-  y: number;
-}
-
 /** Bounding box for rendering calculations */
 export interface BoundingBox {
   minX: number;
   minY: number;
   maxX: number;
   maxY: number;
-}
-
-/**
- * Draft edge state during edge creation.
- * Tracks the in-progress connection as user drags between ports.
- */
-export interface DraftEdge {
-  fromNode: EntityId | null;
-  fromPort: EntityId | null;
-  toNode: EntityId | null;
-  toPort: EntityId | null;
-  startX: number;
-  startY: number;
-  endX: number;
-  endY: number;
-  isOutputStart: boolean;
 }
 
 /**

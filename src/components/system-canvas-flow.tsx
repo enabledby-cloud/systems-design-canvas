@@ -34,11 +34,9 @@ import { Map, X } from 'lucide-react';
 
 import { useSystemStore } from '@/store';
 import {
-  systemToFlow,
   systemToFlowWithBoundaries,
   flattenedViewToFlow,
-  systemNodeToFlowNode,
-  systemEdgeToFlowEdge,
+  generateId,
 } from '@/utils';
 import { SystemNode } from './flow/system-node';
 import { SystemEdge } from './flow/system-edge';
@@ -56,7 +54,6 @@ import {
 import { SystemBoundary } from './canvas/system-boundary';
 import { LayeredModeIndicator } from './canvas/layered-mode-indicator';
 import type { SystemFlowNode, SystemFlowEdge } from '@/types';
-import { generateId } from '@/utils';
 
 // Define custom node types
 const nodeTypes: NodeTypes = {

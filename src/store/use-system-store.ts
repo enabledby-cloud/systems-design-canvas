@@ -9,8 +9,6 @@ import type {
   SystemNode,
   SystemEdge,
   InternalSystem,
-  CanvasOffset,
-  DraftEdge,
   FlattenedView,
   RenderGroup,
   RenameModalState,
@@ -29,15 +27,8 @@ interface SystemState {
 
   // View state
   viewDepth: number;
-  offset: CanvasOffset;
-  scale: number;
   showJson: boolean;
   jsonError: string | null;
-
-  // Interaction state
-  draggingNode: EntityId | null;
-  draftEdge: DraftEdge | null;
-  isPanning: boolean;
 
   // Modal state
   editingNode: SystemNode | null;
@@ -71,18 +62,11 @@ interface SystemState {
   toggleShowJson: () => void;
   setJsonError: (error: string | null) => void;
 
-  // Interaction actions
-  setDraggingNode: (nodeId: EntityId | null) => void;
-  setDraftEdge: (edge: DraftEdge | null) => void;
-  updateDraftEdgeEnd: (endX: number, endY: number) => void;
-  setIsPanning: (isPanning: boolean) => void;
-
   // Node actions
   setEditingNode: (node: SystemNode | null) => void;
   openNodeEditor: (node?: SystemNode | null) => void;
   saveNode: () => void;
   deleteNode: (nodeId: EntityId) => void;
-  updateNodePosition: (nodeId: EntityId, dx: number, dy: number) => void;
 
   // Edge actions
   setEditingEdge: (edge: SystemEdge | null) => void;
@@ -110,13 +94,8 @@ export const useSystemStore = create<SystemState>((set, get) => ({
   systemData: initialSystemData,
   currentPath: [],
   viewDepth: 0,
-  offset: { x: 0, y: 0 },
-  scale: 1,
   showJson: false,
   jsonError: null,
-  draggingNode: null,
-  draftEdge: null,
-  isPanning: false,
   editingNode: null,
   editingEdge: null,
   isClearModalOpen: false,
@@ -307,8 +286,6 @@ export const useSystemStore = create<SystemState>((set, get) => ({
     const { currentPath } = get();
     set({
       currentPath: [...currentPath, nodeId],
-      offset: { x: 0, y: 0 },
-      scale: 1,
       viewDepth: 0,
     });
   },
@@ -317,8 +294,6 @@ export const useSystemStore = create<SystemState>((set, get) => ({
     const { currentPath } = get();
     set({
       currentPath: currentPath.slice(0, index),
-      offset: { x: 0, y: 0 },
-      scale: 1,
       viewDepth: 0,
     });
   },
@@ -338,15 +313,6 @@ export const useSystemStore = create<SystemState>((set, get) => ({
   setShowJson: (show) => set({ showJson: show }),
   toggleShowJson: () => set((state) => ({ showJson: !state.showJson })),
   setJsonError: (error) => set({ jsonError: error }),
-
-  // Interaction actions (legacy - kept for compatibility)
-  setDraggingNode: (nodeId) => set({ draggingNode: nodeId }),
-  setDraftEdge: (edge) => set({ draftEdge: edge }),
-  updateDraftEdgeEnd: (endX, endY) =>
-    set((state) => ({
-      draftEdge: state.draftEdge ? { ...state.draftEdge, endX, endY } : null,
-    })),
-  setIsPanning: (isPanning) => set({ isPanning }),
 
   // Node actions
   setEditingNode: (node) => set({ editingNode: node }),
@@ -454,28 +420,6 @@ export const useSystemStore = create<SystemState>((set, get) => ({
       sys.edges = sys.edges.filter(
         (e) => e.fromNode !== nodeId && e.toNode !== nodeId
       );
-    });
-  },
-
-  updateNodePosition: (nodeId, dx, dy) => {
-    const { scale } = get();
-    get().updateCurrentSystem((sys) => {
-      function findNode(nodes: SystemNode[]): SystemNode | null {
-        for (const n of nodes) {
-          if (n.id === nodeId) return n;
-          if (n.internal?.nodes) {
-            const found = findNode(n.internal.nodes);
-            if (found) return found;
-          }
-        }
-        return null;
-      }
-
-      const node = findNode(sys.nodes);
-      if (node) {
-        node.x = (node.x || 0) + dx / scale;
-        node.y = (node.y || 0) + dy / scale;
-      }
     });
   },
 

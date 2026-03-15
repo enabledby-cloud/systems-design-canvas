@@ -6,12 +6,7 @@
 export { TopBar, Breadcrumbs, JsonEditor } from './layout';
 
 // Canvas overlays
-export {
-  ZoomControls,
-  SystemBoundary,
-  FlattenedGroups,
-  LayeredModeIndicator,
-} from './canvas';
+export { SystemBoundary, LayeredModeIndicator } from './canvas';
 
 // React Flow custom components
 export { SystemNode, SystemEdge } from './flow';

@@ -242,18 +242,3 @@ export function flowToSystem(
     edges: edges.map(flowEdgeToSystemEdge),
   };
 }
-
-/**
- * Updates a SystemNode's position from a React Flow node change.
- */
-export function updateNodePosition(
-  node: SystemNode,
-  newX: number,
-  newY: number
-): SystemNode {
-  return {
-    ...node,
-    x: newX,
-    y: newY,
-  };
-}

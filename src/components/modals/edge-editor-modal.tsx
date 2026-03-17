@@ -4,12 +4,21 @@
  * EdgeEditorModal - modal for editing edge properties.
  */
 
+import { useCallback } from 'react';
 import { Trash2 } from 'lucide-react';
 import { useSystemStore } from '@/store';
+import { useEscapeKey } from '@/utils/use-escape-key';
 
 export function EdgeEditorModal() {
   const { editingEdge, setEditingEdge, saveEdge, deleteEditingEdge } =
     useSystemStore();
+
+  const handleClose = useCallback(() => {
+    setEditingEdge(null);
+  }, [setEditingEdge]);
+
+  // Close on Escape key
+  useEscapeKey(handleClose, !!editingEdge);
 
   if (!editingEdge) return null;
 
@@ -18,8 +27,14 @@ export function EdgeEditorModal() {
   };
 
   return (
-    <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
-      <div className="bg-github-surface p-5 rounded-xl shadow-2xl border border-github-border w-80">
+    <div
+      className="absolute inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[1px]"
+      onClick={handleClose}
+    >
+      <div
+        className="bg-github-surface p-5 rounded-xl shadow-2xl border border-github-border w-80"
+        onClick={(e) => e.stopPropagation()}
+      >
         <h3 className="text-sm font-semibold text-github-text mb-4 uppercase tracking-wider">
           Edit Connection
         </h3>
@@ -61,7 +76,7 @@ export function EdgeEditorModal() {
           </button>
           <div className="flex space-x-2">
             <button
-              onClick={() => setEditingEdge(null)}
+              onClick={handleClose}
               className="px-3 py-1.5 text-xs text-github-text-secondary hover:bg-github-elevated hover:text-github-text rounded transition-colors"
             >
               Cancel

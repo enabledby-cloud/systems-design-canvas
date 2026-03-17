@@ -17,6 +17,7 @@ import type {
   BoundsCache,
 } from '@/types';
 import { generateId, getBoundsRecursive, NODE_WIDTH, NODE_BASE_HEIGHT, PORT_SPACING } from '@/utils';
+import { StorageService, type SavedSystemMeta } from '@/utils/storage-service';
 import { initialSystemData } from './initial-data';
 
 /** Store state interface */
@@ -24,10 +25,10 @@ interface SystemState {
   // Core data
   systemData: SystemData;
   currentPath: EntityId[];
+  currentSaveId: string | null; // ID of the currently loaded saved system
 
   // View state
   viewDepth: number;
-  showJson: boolean;
   jsonError: string | null;
 
   // Modal state
@@ -35,6 +36,14 @@ interface SystemState {
   editingEdge: SystemEdge | null;
   isClearModalOpen: boolean;
   renameModal: RenameModalState;
+  isLibraryModalOpen: boolean;
+  isExportModalOpen: boolean;
+  isImportModalOpen: boolean;
+
+  // Storage state
+  savedSystems: SavedSystemMeta[];
+  hasUnsavedChanges: boolean;
+  lastSavedAt: string | null;
 
   // Computed getters
   getCurrentSystem: () => InternalSystem;
@@ -56,10 +65,6 @@ interface SystemState {
   setViewDepth: (depth: number) => void;
   incrementViewDepth: () => void;
   decrementViewDepth: () => void;
-
-  // JSON editor
-  setShowJson: (show: boolean) => void;
-  toggleShowJson: () => void;
   setJsonError: (error: string | null) => void;
 
   // Node actions
@@ -80,6 +85,22 @@ interface SystemState {
   openRenameModal: () => void;
   setRenameModal: (state: RenameModalState) => void;
   saveRename: () => void;
+
+  // Library modal actions
+  setIsLibraryModalOpen: (open: boolean) => void;
+  setIsExportModalOpen: (open: boolean) => void;
+  setIsImportModalOpen: (open: boolean) => void;
+
+  // Storage actions
+  refreshSavedSystems: () => void;
+  saveToLibrary: (asNew?: boolean) => void;
+  loadSystemFromLibrary: (id: string) => void;
+  deleteSystemFromLibrary: (id: string) => void;
+  duplicateSystemInLibrary: (id: string) => void;
+  createNewSystem: (name?: string) => void;
+  loadDefaultSystem: () => void;
+  autoSave: () => void;
+  markUnsaved: () => void;
 }
 
 /**
@@ -93,13 +114,19 @@ export const useSystemStore = create<SystemState>((set, get) => ({
   // Initial state
   systemData: initialSystemData,
   currentPath: [],
+  currentSaveId: null,
   viewDepth: 0,
-  showJson: false,
   jsonError: null,
   editingNode: null,
   editingEdge: null,
   isClearModalOpen: false,
   renameModal: { isOpen: false, name: '', emergence: '' },
+  isLibraryModalOpen: false,
+  isExportModalOpen: false,
+  isImportModalOpen: false,
+  savedSystems: [],
+  hasUnsavedChanges: false,
+  lastSavedAt: null,
 
   // Computed getters
   getCurrentSystem: () => {
@@ -263,7 +290,7 @@ export const useSystemStore = create<SystemState>((set, get) => ({
   },
 
   // System data actions
-  setSystemData: (data) => set({ systemData: data, jsonError: null }),
+  setSystemData: (data) => set({ systemData: data, jsonError: null, hasUnsavedChanges: true }),
 
   updateCurrentSystem: (updater) => {
     const { systemData, currentPath } = get();
@@ -278,7 +305,7 @@ export const useSystemStore = create<SystemState>((set, get) => ({
     }
 
     updater(current);
-    set({ systemData: newState });
+    set({ systemData: newState, hasUnsavedChanges: true });
   },
 
   // Navigation actions
@@ -308,10 +335,6 @@ export const useSystemStore = create<SystemState>((set, get) => ({
   },
   decrementViewDepth: () =>
     set((state) => ({ viewDepth: Math.max(0, state.viewDepth - 1) })),
-
-  // JSON editor
-  setShowJson: (show) => set({ showJson: show }),
-  toggleShowJson: () => set((state) => ({ showJson: !state.showJson })),
   setJsonError: (error) => set({ jsonError: error }),
 
   // Node actions
@@ -532,6 +555,106 @@ export const useSystemStore = create<SystemState>((set, get) => ({
     set({
       systemData: newState,
       renameModal: { isOpen: false, name: '', emergence: '' },
+      hasUnsavedChanges: true,
     });
+  },
+
+  // Library modal actions
+  setIsLibraryModalOpen: (open) => {
+    if (open) {
+      get().refreshSavedSystems();
+    }
+    set({ isLibraryModalOpen: open });
+  },
+
+  setIsExportModalOpen: (open) => set({ isExportModalOpen: open }),
+  setIsImportModalOpen: (open) => set({ isImportModalOpen: open }),
+
+  // Storage actions
+  refreshSavedSystems: () => {
+    const systems = StorageService.listSavedSystems();
+    set({ savedSystems: systems });
+  },
+
+  saveToLibrary: (asNew = false) => {
+    const { systemData, currentSaveId } = get();
+    const saveId = asNew ? undefined : currentSaveId ?? undefined;
+    const savedSystem = StorageService.saveSystem(systemData, saveId);
+    
+    set({
+      currentSaveId: savedSystem.id,
+      hasUnsavedChanges: false,
+      lastSavedAt: savedSystem.updatedAt,
+    });
+    
+    get().refreshSavedSystems();
+  },
+
+  loadSystemFromLibrary: (id) => {
+    const savedSystem = StorageService.loadSystem(id);
+    if (savedSystem) {
+      set({
+        systemData: savedSystem.data,
+        currentPath: [],
+        viewDepth: 0,
+        currentSaveId: savedSystem.id,
+        hasUnsavedChanges: false,
+        lastSavedAt: savedSystem.updatedAt,
+        jsonError: null,
+      });
+    }
+  },
+
+  deleteSystemFromLibrary: (id) => {
+    StorageService.deleteSystem(id);
+    get().refreshSavedSystems();
+    
+    // If we deleted the currently loaded system, mark as unsaved
+    const { currentSaveId } = get();
+    if (currentSaveId === id) {
+      set({ currentSaveId: null, hasUnsavedChanges: true });
+    }
+  },
+
+  duplicateSystemInLibrary: (id) => {
+    StorageService.duplicateSystem(id);
+    get().refreshSavedSystems();
+  },
+
+  createNewSystem: (name = 'Untitled System') => {
+    const newSystem = StorageService.createBlankSystem(name);
+    set({
+      systemData: newSystem,
+      currentPath: [],
+      viewDepth: 0,
+      currentSaveId: null,
+      hasUnsavedChanges: false,
+      lastSavedAt: null,
+      jsonError: null,
+    });
+  },
+
+  loadDefaultSystem: () => {
+    const defaultSystem = StorageService.getDefaultSystem();
+    set({
+      systemData: defaultSystem,
+      currentPath: [],
+      viewDepth: 0,
+      currentSaveId: null,
+      hasUnsavedChanges: false,
+      lastSavedAt: null,
+      jsonError: null,
+    });
+  },
+
+  autoSave: () => {
+    const { systemData, hasUnsavedChanges } = get();
+    if (hasUnsavedChanges) {
+      StorageService.saveCurrentSystem(systemData);
+    }
+  },
+
+  markUnsaved: () => {
+    set({ hasUnsavedChanges: true });
   },
 }));

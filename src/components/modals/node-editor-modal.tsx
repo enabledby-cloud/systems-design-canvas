@@ -4,13 +4,22 @@
  * NodeEditorModal - modal for creating and editing nodes.
  */
 
+import { useCallback } from 'react';
 import { Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 import { useSystemStore } from '@/store';
 import { generateId } from '@/utils';
+import { useEscapeKey } from '@/utils/use-escape-key';
 import type { Port } from '@/types';
 
 export function NodeEditorModal() {
   const { editingNode, setEditingNode, saveNode } = useSystemStore();
+
+  const handleClose = useCallback(() => {
+    setEditingNode(null);
+  }, [setEditingNode]);
+
+  // Close on Escape key
+  useEscapeKey(handleClose, !!editingNode);
 
   if (!editingNode) return null;
 
@@ -57,8 +66,8 @@ export function NodeEditorModal() {
   };
 
   return (
-    <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-github-surface p-6 rounded-xl shadow-2xl border border-github-border w-[500px] max-h-[90vh] flex flex-col">
+    <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={handleClose}>
+      <div className="bg-github-surface p-6 rounded-xl shadow-2xl border border-github-border w-[500px] max-h-[90vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
         <h2 className="text-xl font-bold text-github-text mb-6 border-b border-github-border pb-2">
           {editingNode.isNew ? 'Create Entity' : 'Edit Entity'}
         </h2>
@@ -246,7 +255,7 @@ export function NodeEditorModal() {
         {/* Actions */}
         <div className="mt-8 flex justify-end space-x-3 pt-4 border-t border-github-border">
           <button
-            onClick={() => setEditingNode(null)}
+            onClick={handleClose}
             className="px-4 py-2 text-sm font-medium text-github-text-secondary hover:text-github-text hover:bg-github-elevated rounded-md transition-colors"
           >
             Cancel

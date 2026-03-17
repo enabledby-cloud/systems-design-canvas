@@ -45,11 +45,13 @@ import { GroupNode } from './flow/group-node';
 import {
   TopBar,
   Breadcrumbs,
-  JsonEditor,
   NodeEditorModal,
   EdgeEditorModal,
   RenameSystemModal,
   ClearAllModal,
+  SystemLibraryModal,
+  ExportJsonModal,
+  ImportJsonModal,
 } from '@/components';
 import { SystemBoundary } from './canvas/system-boundary';
 import { LayeredModeIndicator } from './canvas/layered-mode-indicator';
@@ -84,7 +86,7 @@ function SystemCanvasInner() {
   const systemData = useSystemStore((state) => state.systemData);
   const viewDepth = useSystemStore((state) => state.viewDepth);
   const currentPath = useSystemStore((state) => state.currentPath);
-  const showJson = useSystemStore((state) => state.showJson);
+  const hasUnsavedChanges = useSystemStore((state) => state.hasUnsavedChanges);
   
   // Get functions (stable references)
   const getCurrentSystem = useSystemStore((state) => state.getCurrentSystem);
@@ -92,6 +94,24 @@ function SystemCanvasInner() {
   const getFlattenedView = useSystemStore((state) => state.getFlattenedView);
   const updateCurrentSystem = useSystemStore((state) => state.updateCurrentSystem);
   const createEdge = useSystemStore((state) => state.createEdge);
+  const autoSave = useSystemStore((state) => state.autoSave);
+  const refreshSavedSystems = useSystemStore((state) => state.refreshSavedSystems);
+
+  // Auto-save to local storage periodically when there are unsaved changes
+  useEffect(() => {
+    if (!hasUnsavedChanges) return;
+    
+    const timer = setTimeout(() => {
+      autoSave();
+    }, 5000); // Auto-save after 5 seconds of inactivity
+    
+    return () => clearTimeout(timer);
+  }, [systemData, hasUnsavedChanges, autoSave]);
+
+  // Refresh saved systems list on mount
+  useEffect(() => {
+    refreshSavedSystems();
+  }, [refreshSavedSystems]);
   const getParentNode = useSystemStore((state) => state.getParentNode);
 
   const flattened = isFlattened();
@@ -311,14 +331,14 @@ function SystemCanvasInner() {
         </div>
       </div>
 
-      {/* JSON Editor Sidebar */}
-      {showJson && <JsonEditor />}
-
       {/* Modals */}
       <NodeEditorModal />
       <EdgeEditorModal />
       <RenameSystemModal />
       <ClearAllModal />
+      <SystemLibraryModal />
+      <ExportJsonModal />
+      <ImportJsonModal />
     </div>
   );
 }

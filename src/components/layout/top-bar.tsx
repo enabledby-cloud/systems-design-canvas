@@ -5,22 +5,25 @@
  * Updated to work with React Flow (no canvas ref needed).
  */
 
-import { GitCommit, Plus, Trash2, ArrowLeft, Code, Layers } from 'lucide-react';
+import { GitCommit, Plus, Trash2, ArrowLeft, Layers, Save, FolderOpen, Download, Upload } from 'lucide-react';
 import { useSystemStore } from '@/store';
 
 export function TopBar() {
   const {
     viewDepth,
     currentPath,
-    showJson,
+    hasUnsavedChanges,
     isFlattened,
     getMaxDepth,
     incrementViewDepth,
     decrementViewDepth,
-    toggleShowJson,
     navigateUp,
     openNodeEditor,
     setIsClearModalOpen,
+    saveToLibrary,
+    setIsLibraryModalOpen,
+    setIsExportModalOpen,
+    setIsImportModalOpen,
   } = useSystemStore();
 
   const flattened = isFlattened();
@@ -41,8 +44,50 @@ export function TopBar() {
 
         <div className="h-6 w-px bg-github-border mx-2 hidden sm:block" />
 
+        {/* File Actions */}
+        <div className="flex items-center space-x-1">
+          <button
+            onClick={() => saveToLibrary()}
+            className={`flex items-center space-x-1 px-2.5 py-1.5 rounded-md text-sm transition-colors ${
+              hasUnsavedChanges
+                ? 'bg-accent-blue/20 text-accent-blue hover:bg-accent-blue/30 border border-accent-blue/30'
+                : 'bg-github-bg text-github-text-secondary hover:bg-github-elevated hover:text-github-text border border-github-border'
+            }`}
+            title={hasUnsavedChanges ? 'Save changes' : 'Already saved'}
+          >
+            <Save size={16} />
+            <span className="hidden md:inline">Save</span>
+          </button>
+          <button
+            onClick={() => setIsLibraryModalOpen(true)}
+            className="flex items-center space-x-1 bg-github-bg text-github-text-secondary hover:bg-github-elevated hover:text-github-text px-2.5 py-1.5 rounded-md text-sm transition-colors border border-github-border"
+            title="Open system library"
+          >
+            <FolderOpen size={16} />
+            <span className="hidden md:inline">Library</span>
+          </button>
+          <button
+            onClick={() => setIsExportModalOpen(true)}
+            className="flex items-center space-x-1 bg-github-bg text-github-text-secondary hover:bg-github-elevated hover:text-github-text px-2.5 py-1.5 rounded-md text-sm transition-colors border border-github-border"
+            title="Export system JSON"
+          >
+            <Download size={16} />
+            <span className="hidden md:inline">Export</span>
+          </button>
+          <button
+            onClick={() => setIsImportModalOpen(true)}
+            className="flex items-center space-x-1 bg-github-bg text-github-text-secondary hover:bg-github-elevated hover:text-github-text px-2.5 py-1.5 rounded-md text-sm transition-colors border border-github-border"
+            title="Import system JSON"
+          >
+            <Upload size={16} />
+            <span className="hidden md:inline">Import</span>
+          </button>
+        </div>
+
+        <div className="h-6 w-px bg-github-border mx-2 hidden lg:block" />
+
         {/* Layer Controls */}
-        <div className="flex items-center space-x-1 bg-github-bg border border-github-border rounded-md p-1 mr-2 shadow-inner">
+        <div className="hidden lg:flex items-center space-x-1 bg-github-bg border border-github-border rounded-md p-1 mr-2 shadow-inner">
           <div className="px-2 text-xs font-semibold text-github-text-secondary uppercase tracking-wider flex items-center gap-1">
             <Layers size={14} /> Depth
           </div>
@@ -100,21 +145,6 @@ export function TopBar() {
             <span>Go Up</span>
           </button>
         )}
-      </div>
-
-      {/* Right side - JSON toggle */}
-      <div className="flex items-center space-x-2">
-        <button
-          onClick={toggleShowJson}
-          className={`flex items-center space-x-2 px-3 py-1.5 rounded-md text-sm transition-colors border ${
-            showJson
-              ? 'bg-github-elevated border-github-border text-github-text'
-              : 'bg-github-bg border-github-border text-github-text-secondary hover:bg-github-elevated hover:text-github-text'
-          }`}
-        >
-          <Code size={16} />
-          <span>{showJson ? 'Hide JSON' : 'Show JSON'}</span>
-        </button>
       </div>
     </div>
   );

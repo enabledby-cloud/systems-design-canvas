@@ -6,7 +6,7 @@
  */
 
 import { memo, useCallback } from 'react';
-import { Handle, Position, useReactFlow, NodeProps } from '@xyflow/react';
+import { Handle, Position, NodeProps } from '@xyflow/react';
 import { Box, Edit2, Maximize2, Trash2 } from 'lucide-react';
 import { useSystemStore } from '@/store';
 import type { SystemFlowNode } from '@/types';
@@ -19,7 +19,6 @@ export const SystemNode = memo(function SystemNode({
   positionAbsoluteY,
 }: NodeProps<SystemFlowNode>) {
   const { openNodeEditor, enterNode, deleteNode, isFlattened } = useSystemStore();
-  const { deleteElements } = useReactFlow();
   
   const flattened = isFlattened();
   // Get inputs/outputs with fallbacks

@@ -10,7 +10,6 @@ import {
   BaseEdge,
   EdgeLabelRenderer,
   getBezierPath,
-  useReactFlow,
 } from '@xyflow/react';
 import { useSystemStore } from '@/store';
 import type { SystemEdgeProps } from '@/types';

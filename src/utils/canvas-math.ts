@@ -1,5 +1,5 @@
 /**
- * Canvas math utilities for SysWeaver.
+ * Canvas math utilities for System (enabledby.cloud/system).
  * Contains Bezier curve calculations, ID generation, and bounding box math.
  */
 

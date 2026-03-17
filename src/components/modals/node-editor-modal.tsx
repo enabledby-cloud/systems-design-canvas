@@ -58,27 +58,27 @@ export function NodeEditorModal() {
 
   return (
     <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="bg-slate-800 p-6 rounded-xl shadow-2xl border border-slate-700 w-[500px] max-h-[90vh] flex flex-col">
-        <h2 className="text-xl font-bold text-slate-100 mb-6 border-b border-slate-700 pb-2">
+      <div className="bg-github-surface p-6 rounded-xl shadow-2xl border border-github-border w-[500px] max-h-[90vh] flex flex-col">
+        <h2 className="text-xl font-bold text-github-text mb-6 border-b border-github-border pb-2">
           {editingNode.isNew ? 'Create Entity' : 'Edit Entity'}
         </h2>
 
         <div className="space-y-5 overflow-y-auto pr-2 flex-1 custom-scrollbar">
           {/* External Entity Toggle */}
-          <div className="flex items-center p-3 bg-slate-900/50 border border-slate-700 rounded-md">
+          <div className="flex items-center p-3 bg-github-bg/50 border border-github-border rounded-md">
             <input
               type="checkbox"
               id="external-toggle"
               checked={editingNode.isExternal}
               onChange={(e) => updateNode({ isExternal: e.target.checked })}
-              className="w-4 h-4 text-indigo-600 bg-slate-800 border-slate-600 rounded focus:ring-indigo-500 focus:ring-2"
+              className="w-4 h-4 text-accent-blue bg-github-bg border-github-border rounded focus:ring-accent-blue focus:ring-2"
             />
             <label
               htmlFor="external-toggle"
-              className="ml-2 text-sm font-medium text-slate-300 cursor-pointer flex-1"
+              className="ml-2 text-sm font-medium text-github-text cursor-pointer flex-1"
             >
               External Entity{' '}
-              <span className="text-slate-500 text-xs font-normal ml-1">
+              <span className="text-github-text-secondary text-xs font-normal ml-1">
                 (Sits outside the System Boundary)
               </span>
             </label>
@@ -86,21 +86,21 @@ export function NodeEditorModal() {
 
           {/* Entity Name */}
           <div>
-            <label className="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">
+            <label className="block text-xs font-semibold text-github-text-secondary mb-1 uppercase tracking-wider">
               Entity Name
             </label>
             <input
               type="text"
               value={editingNode.name}
               onChange={(e) => updateNode({ name: e.target.value })}
-              className="w-full bg-slate-900 border border-slate-600 rounded-md px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-cyan-500 transition-all"
+              className="w-full bg-github-bg border border-github-border rounded-md px-3 py-2 text-sm text-github-text focus:outline-none focus:border-accent-blue transition-all"
             />
           </div>
 
           {/* Process & Operand */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">
+              <label className="block text-xs font-semibold text-github-text-secondary mb-1 uppercase tracking-wider">
                 Function: Process
               </label>
               <input
@@ -108,11 +108,11 @@ export function NodeEditorModal() {
                 value={editingNode.process || ''}
                 onChange={(e) => updateNode({ process: e.target.value })}
                 placeholder="e.g. Harvest"
-                className="w-full bg-slate-900 border border-slate-600 rounded-md px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-cyan-500 transition-all"
+                className="w-full bg-github-bg border border-github-border rounded-md px-3 py-2 text-sm text-github-text focus:outline-none focus:border-accent-blue transition-all"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">
+              <label className="block text-xs font-semibold text-github-text-secondary mb-1 uppercase tracking-wider">
                 Function: Operand
               </label>
               <input
@@ -120,22 +120,22 @@ export function NodeEditorModal() {
                 value={editingNode.operand || ''}
                 onChange={(e) => updateNode({ operand: e.target.value })}
                 placeholder="e.g. Materials"
-                className="w-full bg-slate-900 border border-slate-600 rounded-md px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-cyan-500 transition-all"
+                className="w-full bg-github-bg border border-github-border rounded-md px-3 py-2 text-sm text-github-text focus:outline-none focus:border-accent-blue transition-all"
               />
             </div>
           </div>
 
           {/* Ports */}
-          <div className="grid grid-cols-2 gap-6 pt-2 border-t border-slate-700/50">
+          <div className="grid grid-cols-2 gap-6 pt-2 border-t border-github-border/50">
             {/* Inputs */}
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                <label className="text-xs font-semibold text-github-text-secondary uppercase tracking-wider">
                   Inputs
                 </label>
                 <button
                   onClick={() => addPort('inputs')}
-                  className="text-xs bg-slate-700 hover:bg-slate-600 text-slate-200 px-2 py-1 rounded transition-colors"
+                  className="text-xs bg-github-elevated hover:bg-github-border text-github-text px-2 py-1 rounded transition-colors"
                 >
                   + Add
                 </button>
@@ -147,7 +147,7 @@ export function NodeEditorModal() {
                       <button
                         onClick={() => movePort('inputs', idx, 'up')}
                         disabled={idx === 0}
-                        className="text-slate-500 hover:text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed p-0.5 transition-colors"
+                        className="text-github-text-muted hover:text-github-text disabled:opacity-30 disabled:cursor-not-allowed p-0.5 transition-colors"
                         title="Move up"
                       >
                         <ChevronUp size={12} />
@@ -155,7 +155,7 @@ export function NodeEditorModal() {
                       <button
                         onClick={() => movePort('inputs', idx, 'down')}
                         disabled={idx === editingNode.inputs.length - 1}
-                        className="text-slate-500 hover:text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed p-0.5 transition-colors"
+                        className="text-github-text-muted hover:text-github-text disabled:opacity-30 disabled:cursor-not-allowed p-0.5 transition-colors"
                         title="Move down"
                       >
                         <ChevronDown size={12} />
@@ -165,18 +165,18 @@ export function NodeEditorModal() {
                       type="text"
                       value={port.name}
                       onChange={(e) => updatePort('inputs', idx, e.target.value)}
-                      className="flex-1 bg-slate-900 border border-slate-600 rounded px-2 py-1.5 text-xs text-slate-200 focus:border-cyan-500 outline-none"
+                      className="flex-1 bg-github-bg border border-github-border rounded px-2 py-1.5 text-xs text-github-text focus:border-accent-green outline-none"
                     />
                     <button
                       onClick={() => removePort('inputs', port.id)}
-                      className="text-slate-500 hover:text-red-400 p-1"
+                      className="text-github-text-muted hover:text-accent-pink p-1"
                     >
                       <Trash2 size={14} />
                     </button>
                   </div>
                 ))}
                 {editingNode.inputs.length === 0 && (
-                  <div className="text-xs text-slate-500 italic text-center py-2">
+                  <div className="text-xs text-github-text-muted italic text-center py-2">
                     No inputs
                   </div>
                 )}
@@ -186,12 +186,12 @@ export function NodeEditorModal() {
             {/* Outputs */}
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                <label className="text-xs font-semibold text-github-text-secondary uppercase tracking-wider">
                   Outputs
                 </label>
                 <button
                   onClick={() => addPort('outputs')}
-                  className="text-xs bg-slate-700 hover:bg-slate-600 text-slate-200 px-2 py-1 rounded transition-colors"
+                  className="text-xs bg-github-elevated hover:bg-github-border text-github-text px-2 py-1 rounded transition-colors"
                 >
                   + Add
                 </button>
@@ -203,7 +203,7 @@ export function NodeEditorModal() {
                       <button
                         onClick={() => movePort('outputs', idx, 'up')}
                         disabled={idx === 0}
-                        className="text-slate-500 hover:text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed p-0.5 transition-colors"
+                        className="text-github-text-muted hover:text-github-text disabled:opacity-30 disabled:cursor-not-allowed p-0.5 transition-colors"
                         title="Move up"
                       >
                         <ChevronUp size={12} />
@@ -211,7 +211,7 @@ export function NodeEditorModal() {
                       <button
                         onClick={() => movePort('outputs', idx, 'down')}
                         disabled={idx === editingNode.outputs.length - 1}
-                        className="text-slate-500 hover:text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed p-0.5 transition-colors"
+                        className="text-github-text-muted hover:text-github-text disabled:opacity-30 disabled:cursor-not-allowed p-0.5 transition-colors"
                         title="Move down"
                       >
                         <ChevronDown size={12} />
@@ -223,18 +223,18 @@ export function NodeEditorModal() {
                       onChange={(e) =>
                         updatePort('outputs', idx, e.target.value)
                       }
-                      className="flex-1 bg-slate-900 border border-slate-600 rounded px-2 py-1.5 text-xs text-slate-200 focus:border-cyan-500 outline-none"
+                      className="flex-1 bg-github-bg border border-github-border rounded px-2 py-1.5 text-xs text-github-text focus:border-accent-pink outline-none"
                     />
                     <button
                       onClick={() => removePort('outputs', port.id)}
-                      className="text-slate-500 hover:text-red-400 p-1"
+                      className="text-github-text-muted hover:text-accent-pink p-1"
                     >
                       <Trash2 size={14} />
                     </button>
                   </div>
                 ))}
                 {editingNode.outputs.length === 0 && (
-                  <div className="text-xs text-slate-500 italic text-center py-2">
+                  <div className="text-xs text-github-text-muted italic text-center py-2">
                     No outputs
                   </div>
                 )}
@@ -244,16 +244,16 @@ export function NodeEditorModal() {
         </div>
 
         {/* Actions */}
-        <div className="mt-8 flex justify-end space-x-3 pt-4 border-t border-slate-700">
+        <div className="mt-8 flex justify-end space-x-3 pt-4 border-t border-github-border">
           <button
             onClick={() => setEditingNode(null)}
-            className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700 rounded-md transition-colors"
+            className="px-4 py-2 text-sm font-medium text-github-text-secondary hover:text-github-text hover:bg-github-elevated rounded-md transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={saveNode}
-            className="px-5 py-2 text-sm font-medium bg-cyan-600 hover:bg-cyan-500 text-white rounded-md transition-colors shadow-lg shadow-cyan-900/50"
+            className="px-5 py-2 text-sm font-medium bg-accent-blue hover:bg-accent-blue/80 text-white rounded-md transition-colors shadow-glow-blue"
           >
             Save Entity
           </button>

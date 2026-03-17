@@ -16,7 +16,7 @@ export function LayeredModeIndicator() {
 
   return (
     <Panel position="top-center" className="!m-4">
-      <div className="bg-indigo-900/80 border border-indigo-500/50 text-indigo-200 px-4 py-2 rounded-full text-xs font-medium shadow-lg flex items-center gap-2 backdrop-blur-sm pointer-events-none">
+      <div className="bg-gradient-to-r from-accent-pink/20 to-accent-blue/20 border border-accent-blue/50 text-accent-blue px-4 py-2 rounded-full text-xs font-medium shadow-glow-blue flex items-center gap-2 backdrop-blur-sm pointer-events-none">
         <Layers size={14} />
         Layered Analysis Active: Structural editing is disabled.
       </div>

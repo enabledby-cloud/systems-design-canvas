@@ -1,6 +1,6 @@
 /**
  * React Flow specific type definitions.
- * Extends React Flow types with SysWeaver-specific data.
+ * Extends React Flow types with System-specific data.
  */
 
 import type { Node, Edge, NodeProps, EdgeProps } from '@xyflow/react';

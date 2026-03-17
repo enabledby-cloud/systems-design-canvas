@@ -26,32 +26,32 @@ function getMillerColor(count: number): {
 } {
   if (count <= MILLER_COMFORTABLE) {
     return {
-      bg: 'bg-emerald-500/10',
-      text: 'text-emerald-400',
-      border: 'border-emerald-500/30',
+      bg: 'bg-accent-green/10',
+      text: 'text-accent-green',
+      border: 'border-accent-green/30',
       status: 'Comfortable',
     };
   }
   if (count <= MILLER_OPTIMAL) {
     return {
-      bg: 'bg-yellow-500/10',
-      text: 'text-yellow-400',
-      border: 'border-yellow-500/30',
+      bg: 'bg-accent-orange/10',
+      text: 'text-accent-orange',
+      border: 'border-accent-orange/30',
       status: 'Optimal',
     };
   }
   if (count <= MILLER_LIMIT) {
     return {
-      bg: 'bg-orange-500/10',
-      text: 'text-orange-400',
-      border: 'border-orange-500/30',
+      bg: 'bg-accent-orange/20',
+      text: 'text-accent-orange',
+      border: 'border-accent-orange/40',
       status: 'At Limit',
     };
   }
   return {
-    bg: 'bg-red-500/10',
-    text: 'text-red-400',
-    border: 'border-red-500/30',
+    bg: 'bg-accent-pink/10',
+    text: 'text-accent-pink',
+    border: 'border-accent-pink/30',
     status: 'Exceeds Limit',
   };
 }
@@ -88,19 +88,19 @@ export function Breadcrumbs() {
   }
 
   return (
-    <div className="flex items-center p-3 bg-slate-900 border-b border-slate-800 text-sm min-h-[52px]">
+    <div className="flex items-center p-3 bg-github-surface border-b border-github-border text-sm min-h-[52px]">
       <div className="flex items-center space-x-2 flex-1">
         {paths.map((p, idx) => {
           const isLast = idx === paths.length - 1;
 
           return (
             <React.Fragment key={p.id}>
-              {idx > 0 && <span className="text-slate-600">/</span>}
+              {idx > 0 && <span className="text-github-text-muted">/</span>}
               {isLast ? (
                 <div className="flex items-center">
                   <div
                     onClick={openRenameModal}
-                    className="group flex items-center text-blue-400 font-semibold cursor-pointer hover:text-blue-300 transition-colors"
+                    className="group flex items-center text-accent-blue font-semibold cursor-pointer hover:text-accent-blue/80 transition-colors"
                     title="Edit System Properties"
                     role="button"
                     tabIndex={0}
@@ -114,10 +114,10 @@ export function Breadcrumbs() {
                   </div>
                   {p.emergence && (
                     <div
-                      className="ml-4 flex items-center px-2.5 py-1 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-200/90 text-xs font-medium tracking-wide shadow-sm"
+                      className="ml-4 flex items-center px-2.5 py-1 rounded-full border border-accent-orange/30 bg-accent-orange/10 text-accent-orange text-xs font-medium tracking-wide shadow-sm"
                       title="System Emergence"
                     >
-                      <Zap size={12} className="mr-1.5 text-amber-400" />
+                      <Zap size={12} className="mr-1.5 text-accent-orange" />
                       Emergence: {p.emergence}
                     </div>
                   )}
@@ -125,7 +125,7 @@ export function Breadcrumbs() {
               ) : (
                 <button
                   onClick={() => navigateUp(idx)}
-                  className="text-slate-400 hover:text-slate-200 transition-colors text-base"
+                  className="text-github-text-secondary hover:text-github-text transition-colors text-base"
                 >
                   {p.name}
                 </button>
@@ -145,18 +145,18 @@ export function Breadcrumbs() {
           <span className={`text-xs font-semibold ${millerColors.text}`}>
             {entityCounts.internal}
           </span>
-          <span className="text-xs text-slate-500">in system</span>
+          <span className="text-xs text-github-text-secondary">in system</span>
           {entityCounts.external > 0 && (
             <>
-              <span className="text-slate-600">·</span>
-              <span className="text-xs text-slate-500">
+              <span className="text-github-text-muted">·</span>
+              <span className="text-xs text-github-text-secondary">
                 {entityCounts.external} external
               </span>
             </>
           )}
         </div>
         {entityCounts.internal > MILLER_LIMIT && (
-          <AlertTriangle size={14} className="text-red-400 animate-pulse" />
+          <AlertTriangle size={14} className="text-accent-pink animate-pulse" />
         )}
       </div>
     </div>

@@ -1,5 +1,5 @@
 /**
- * Core type definitions for the SysWeaver systems design canvas.
+ * Core type definitions for the System design canvas (enabledby.cloud/system).
  * Defines the data structures for nodes, edges, ports, and the overall system hierarchy.
  */
 

@@ -28,13 +28,13 @@ export const GroupNode = memo(function GroupNode({
 
   return (
     <div
-      className="border-2 border-dashed rounded-xl border-indigo-500/40 bg-indigo-900/10 relative"
+      className="border-2 border-dashed rounded-xl border-accent-blue/40 bg-accent-blue/5 relative"
       style={{ width: `${width}px`, height: `${height}px` }}
     >
       {/* Group Header */}
-      <div className="absolute -top-3 left-4 bg-slate-900 px-3 py-1 rounded shadow-sm border border-indigo-500/50 flex items-center gap-2 z-10">
-        <Layers size={14} className="text-indigo-400" />
-        <span className="text-indigo-400 font-bold uppercase tracking-wider text-[11px]">
+      <div className="absolute -top-3 left-4 bg-github-bg px-3 py-1 rounded shadow-sm border border-accent-blue/50 flex items-center gap-2 z-10">
+        <Layers size={14} className="text-accent-blue" />
+        <span className="text-accent-blue font-bold uppercase tracking-wider text-[11px]">
           {name}
         </span>
       </div>
@@ -49,7 +49,7 @@ export const GroupNode = memo(function GroupNode({
             style={{ top: yPos - 8, left: -8 }}
           >
             {/* Label above the connector */}
-            <span className="absolute -top-4 left-0 text-[10px] text-emerald-400 whitespace-nowrap font-medium">
+            <span className="absolute -top-4 left-0 text-[10px] text-accent-green whitespace-nowrap font-medium">
               {port.name}
             </span>
             {/* Target handle - receives external edges */}
@@ -57,7 +57,7 @@ export const GroupNode = memo(function GroupNode({
               type="target"
               position={Position.Left}
               id={port.id}
-              className="!w-4 !h-4 !bg-emerald-500 !border-2 !border-emerald-400 !rounded-full !relative !transform-none !inset-auto"
+              className="!w-4 !h-4 !bg-accent-green !border-2 !border-accent-green/70 !rounded-full !relative !transform-none !inset-auto"
             />
             {/* Source handle - same position, sends to internal nodes (invisible) */}
             <Handle
@@ -80,7 +80,7 @@ export const GroupNode = memo(function GroupNode({
             style={{ top: yPos - 8, right: -8 }}
           >
             {/* Label above the connector */}
-            <span className="absolute -top-4 right-0 text-[10px] text-indigo-400 whitespace-nowrap font-medium">
+            <span className="absolute -top-4 right-0 text-[10px] text-accent-pink whitespace-nowrap font-medium">
               {port.name}
             </span>
             {/* Target handle - receives from internal nodes (invisible, same position) */}
@@ -95,7 +95,7 @@ export const GroupNode = memo(function GroupNode({
               type="source"
               position={Position.Right}
               id={port.id}
-              className="!w-4 !h-4 !bg-indigo-500 !border-2 !border-indigo-400 !rounded-full !relative !transform-none !inset-auto"
+              className="!w-4 !h-4 !bg-accent-pink !border-2 !border-accent-pink/70 !rounded-full !relative !transform-none !inset-auto"
             />
           </div>
         );

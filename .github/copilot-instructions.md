@@ -1,10 +1,11 @@
-# SysWeaver - Copilot Instructions
+# System - Copilot Instructions
 
 > Systems Thinking diagramming tool with infinite canvas and semantic zooming.
+> https://enabledby.cloud/system
 
 ## Project Overview
 
-SysWeaver is a **frontend-only** Next.js application for modeling systems using a visual, node-based canvas. It implements hierarchical decomposition (drill into subsystems), layered analysis (semantic zoom), and exports/imports system definitions as JSON.
+System is a **frontend-only** Next.js application for modeling systems using a visual, node-based canvas. It implements hierarchical decomposition (drill into subsystems), layered analysis (semantic zoom), and exports/imports system definitions as JSON.
 
 ## Tech Stack
 

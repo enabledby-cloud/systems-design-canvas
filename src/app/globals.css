@@ -2,9 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import fonts - IBM Plex Sans for UI, JetBrains Mono for code */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
 :root {
-  --background: #0f172a;
-  --foreground: #e2e8f0;
+  /* GitHub-like dark theme */
+  --background: #0D1117;
+  --foreground: #C9D1D9;
+  --surface: #161B22;
+  --surface-elevated: #21262D;
+  --border: #30363D;
+  --border-muted: #21262D;
+  
+  /* Brand gradients */
+  --gradient-primary: linear-gradient(135deg, #ff5e84 0%, #3e8bff 100%);
+  --gradient-secondary: linear-gradient(135deg, #ff5e84 0%, #59f4b2 100%);
+  --gradient-tertiary: linear-gradient(135deg, #ff5e84 0%, #ff8e26 100%);
+  
+  /* Accent colors */
+  --accent-pink: #ff5e84;
+  --accent-blue: #3e8bff;
+  --accent-green: #59f4b2;
+  --accent-orange: #ff8e26;
+  
+  /* Text colors */
+  --text-primary: #C9D1D9;
+  --text-secondary: #8B949E;
+  --text-muted: #484F58;
 }
 
 * {
@@ -22,9 +46,51 @@ body {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Gradient text utility */
+.gradient-text-primary {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-secondary {
+  background: var(--gradient-secondary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-tertiary {
+  background: var(--gradient-tertiary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Gradient border utility */
+.gradient-border-primary {
+  position: relative;
+  background: var(--surface);
+  border-radius: 8px;
+}
+.gradient-border-primary::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  padding: 1px;
+  border-radius: 9px;
+  background: var(--gradient-primary);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 /* Custom scrollbar for the app */
@@ -33,22 +99,22 @@ body {
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: #1e293b;
+  background: var(--surface);
   border-radius: 3px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #475569;
+  background: var(--border);
   border-radius: 3px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
+  background: var(--text-secondary);
 }
 
-/* Selection colors */
+/* Selection colors - using primary gradient start */
 ::selection {
-  background: #6366f1;
+  background: var(--accent-pink);
   color: #ffffff;
 }
 
@@ -84,41 +150,41 @@ body {
 }
 
 .react-flow__edge-path {
-  stroke: #475569;
+  stroke: var(--border);
   stroke-width: 2;
 }
 
 .react-flow__edge.selected .react-flow__edge-path {
-  stroke: #818cf8;
+  stroke: var(--accent-blue);
 }
 
 .react-flow__edge:hover .react-flow__edge-path {
-  stroke: #818cf8;
+  stroke: var(--accent-blue);
 }
 
 .react-flow__connection-line {
-  stroke: #818cf8;
+  stroke: var(--accent-pink);
   stroke-width: 2;
   stroke-dasharray: 5 5;
 }
 
 /* Controls styling */
 .react-flow__controls {
-  background: #1e293b !important;
-  border: 1px solid #334155 !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
   border-radius: 8px !important;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4) !important;
 }
 
 .react-flow__controls-button {
-  background: #1e293b !important;
+  background: var(--surface) !important;
   border: none !important;
-  color: #94a3b8 !important;
+  color: var(--text-secondary) !important;
 }
 
 .react-flow__controls-button:hover {
-  background: #334155 !important;
-  color: #e2e8f0 !important;
+  background: var(--surface-elevated) !important;
+  color: var(--text-primary) !important;
 }
 
 .react-flow__controls-button svg {
@@ -127,14 +193,36 @@ body {
 
 /* MiniMap styling */
 .react-flow__minimap {
-  background: #1e293b !important;
-  border: 1px solid #334155 !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
   border-radius: 8px !important;
 }
 
 .react-flow__minimap-mask {
-  fill: rgba(15, 23, 42, 0.8) !important;
+  fill: rgba(13, 17, 23, 0.8) !important;
 }
 
 /* Attribution removal handled via proOptions */
 
+/* Glow effects for interactive elements */
+.glow-pink {
+  box-shadow: 0 0 20px rgba(255, 94, 132, 0.3), 0 0 40px rgba(255, 94, 132, 0.1);
+}
+
+.glow-blue {
+  box-shadow: 0 0 20px rgba(62, 139, 255, 0.3), 0 0 40px rgba(62, 139, 255, 0.1);
+}
+
+.glow-green {
+  box-shadow: 0 0 20px rgba(89, 244, 178, 0.3), 0 0 40px rgba(89, 244, 178, 0.1);
+}
+
+/* Animation utilities */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}

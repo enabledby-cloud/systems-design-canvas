@@ -26,7 +26,7 @@ export function SystemBoundary() {
 
   return (
     <div
-      className="absolute border-4 border-dashed border-red-500/40 bg-red-500/5 rounded-xl pointer-events-none"
+      className="absolute border-4 border-dashed border-accent-pink/40 bg-accent-pink/5 rounded-xl pointer-events-none"
       style={{
         left: bounds.minX * zoom + x,
         top: bounds.minY * zoom + y,
@@ -36,7 +36,7 @@ export function SystemBoundary() {
       }}
     >
       <div 
-        className="text-red-400 font-black uppercase tracking-widest px-5 py-2 flex items-center gap-2 opacity-80"
+        className="text-accent-pink font-black uppercase tracking-widest px-5 py-2 flex items-center gap-2 opacity-80"
         style={{ fontSize: `${11 * zoom}px` }}
       >
         <Layers size={14 * zoom} /> SYSTEM BOUNDARY

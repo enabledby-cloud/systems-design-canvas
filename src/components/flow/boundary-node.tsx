@@ -17,31 +17,31 @@ export const BoundaryNode = memo(function BoundaryNode({
 
   return (
     <div className="flex flex-col space-y-2 min-w-[140px]">
-      <div className={`text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 ${isInput ? 'text-left' : 'text-right'}`}>
+      <div className={`text-xs font-bold text-github-text-muted uppercase tracking-wider mb-1 ${isInput ? 'text-left' : 'text-right'}`}>
         {boundaryLabel || (isInput ? 'Boundary Inputs' : 'Boundary Outputs')}
       </div>
       {boundaryPorts.length === 0 && (
-        <div className={`text-xs text-slate-600 italic px-3 ${isInput ? 'text-left' : 'text-right'}`}>
+        <div className={`text-xs text-github-text-muted italic px-3 ${isInput ? 'text-left' : 'text-right'}`}>
           No {isInput ? 'inputs' : 'outputs'}
         </div>
       )}
       {boundaryPorts.map((port) => (
         <div
           key={port.id}
-          className={`flex items-center relative bg-slate-800/90 border border-slate-600 shadow-lg h-9 backdrop-blur-sm ${
+          className={`flex items-center relative bg-github-surface/90 border border-github-border shadow-lg h-9 backdrop-blur-sm ${
             isInput ? 'rounded-r-lg pl-3 pr-6' : 'rounded-l-lg pr-3 pl-6'
           }`}
         >
           {isInput ? (
             <>
-              <span className="text-slate-200 text-xs font-medium whitespace-nowrap">
+              <span className="text-github-text text-xs font-medium whitespace-nowrap">
                 {port.name}
               </span>
               <Handle
                 type="source"
                 position={Position.Right}
                 id={port.id}
-                className="!w-4 !h-4 !bg-slate-900 !border-2 !border-indigo-500 !rounded-full hover:!bg-indigo-500 !transition-colors !-right-2"
+                className="!w-4 !h-4 !bg-github-bg !border-2 !border-accent-pink !rounded-full hover:!bg-accent-pink !transition-colors !-right-2"
                 style={{ top: 'auto' }}
               />
             </>
@@ -51,10 +51,10 @@ export const BoundaryNode = memo(function BoundaryNode({
                 type="target"
                 position={Position.Left}
                 id={port.id}
-                className="!w-4 !h-4 !bg-slate-900 !border-2 !border-emerald-500 !rounded-full hover:!bg-emerald-500 !transition-colors !-left-2"
+                className="!w-4 !h-4 !bg-github-bg !border-2 !border-accent-green !rounded-full hover:!bg-accent-green !transition-colors !-left-2"
                 style={{ top: 'auto' }}
               />
-              <span className="text-slate-200 text-xs font-medium whitespace-nowrap">
+              <span className="text-github-text text-xs font-medium whitespace-nowrap">
                 {port.name}
               </span>
             </>

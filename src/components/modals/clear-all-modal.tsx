@@ -15,15 +15,15 @@ export function ClearAllModal() {
 
   return (
     <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
-      <div className="bg-slate-800 p-6 rounded-xl shadow-2xl border border-slate-600 w-96 max-w-full">
-        <div className="flex items-center space-x-3 mb-4 text-red-400">
+      <div className="bg-github-surface p-6 rounded-xl shadow-2xl border border-github-border w-96 max-w-full">
+        <div className="flex items-center space-x-3 mb-4 text-accent-pink">
           <AlertTriangle size={24} />
-          <h3 className="text-lg font-semibold uppercase tracking-wider text-slate-100">
+          <h3 className="text-lg font-semibold uppercase tracking-wider text-github-text">
             Clear Canvas
           </h3>
         </div>
 
-        <p className="text-sm text-slate-300 mb-6">
+        <p className="text-sm text-github-text-secondary mb-6">
           Are you sure you want to delete all entities and connections in the
           current view? This cannot be undone.
         </p>
@@ -31,13 +31,13 @@ export function ClearAllModal() {
         <div className="flex justify-end space-x-3">
           <button
             onClick={() => setIsClearModalOpen(false)}
-            className="px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 rounded transition-colors"
+            className="px-4 py-2 text-sm text-github-text-secondary hover:bg-github-elevated hover:text-github-text rounded transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={handleClearAll}
-            className="px-4 py-2 text-sm bg-red-600 hover:bg-red-500 text-white rounded transition-colors shadow-lg shadow-red-900/50"
+            className="px-4 py-2 text-sm bg-accent-pink hover:bg-accent-pink/80 text-white rounded transition-colors shadow-glow-pink"
           >
             Yes, Clear All
           </button>

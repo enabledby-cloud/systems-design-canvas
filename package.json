@@ -1,8 +1,8 @@
 {
-  "name": "sysweaver",
+  "name": "system-enabledby-cloud",
   "version": "0.1.0",
   "private": true,
-  "description": "Systems Thinking diagramming tool with infinite canvas and semantic zooming",
+  "description": "Systems Thinking diagramming tool with infinite canvas and semantic zooming - enabledby.cloud/system",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

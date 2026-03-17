@@ -41,23 +41,23 @@ export function JsonEditor() {
   };
 
   return (
-    <div className="w-[400px] bg-slate-900 border-l border-slate-800 flex flex-col z-30 shadow-2xl">
+    <div className="w-[400px] bg-github-surface border-l border-github-border flex flex-col z-30 shadow-2xl">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800">
-        <h3 className="font-semibold text-slate-200 flex items-center gap-2">
-          <DatabaseIcon size={16} /> System Blueprint
+      <div className="flex items-center justify-between px-4 py-3 border-b border-github-border">
+        <h3 className="font-semibold text-github-text flex items-center gap-2">
+          <DatabaseIcon size={16} /> <span className="gradient-text-primary">System Blueprint</span>
         </h3>
       </div>
 
       {/* Editor */}
       <div className="flex-1 p-4 flex flex-col relative">
         {jsonError && (
-          <div className="absolute top-4 left-4 right-4 bg-red-900/50 border border-red-500 text-red-200 p-2 rounded text-xs z-10">
+          <div className="absolute top-4 left-4 right-4 bg-accent-pink/20 border border-accent-pink text-accent-pink p-2 rounded text-xs z-10">
             {jsonError}
           </div>
         )}
         <textarea
-          className="flex-1 w-full bg-slate-950 border border-slate-800 rounded p-4 font-mono text-xs text-green-400 focus:outline-none focus:border-indigo-500 resize-none whitespace-pre"
+          className="flex-1 w-full bg-github-bg border border-github-border rounded p-4 font-mono text-xs text-accent-green focus:outline-none focus:border-accent-blue resize-none whitespace-pre"
           value={JSON.stringify(systemData, null, 2)}
           onChange={handleChange}
           spellCheck="false"
@@ -65,9 +65,9 @@ export function JsonEditor() {
       </div>
 
       {/* Footer */}
-      <div className="p-4 border-t border-slate-800 text-xs text-slate-500">
+      <div className="p-4 border-t border-github-border text-xs text-github-text-secondary">
         Edit the JSON directly to update the visual canvas. External entities (
-        <code className="text-slate-300">isExternal: true</code>) sit outside
+        <code className="text-github-text">isExternal: true</code>) sit outside
         the main system boundary.
       </div>
     </div>

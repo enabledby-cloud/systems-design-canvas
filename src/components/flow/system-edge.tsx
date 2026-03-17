@@ -60,7 +60,7 @@ export const SystemEdge = memo(function SystemEdge({
         id={id}
         path={edgePath}
         style={{
-          stroke: selected ? '#818cf8' : '#475569',
+          stroke: selected ? '#3e8bff' : '#30363D',
           strokeWidth: 2,
         }}
         interactionWidth={20}
@@ -80,13 +80,13 @@ export const SystemEdge = memo(function SystemEdge({
           >
             {/* Interaction label */}
             {interaction && (
-              <div className="text-center text-xs font-medium text-slate-400 bg-slate-900/80 px-2 py-0.5 rounded shadow-sm border border-slate-700/50 hover:text-indigo-300 hover:border-indigo-500/50 transition-colors">
+              <div className="text-center text-xs font-medium text-github-text-secondary bg-github-bg/80 px-2 py-0.5 rounded shadow-sm border border-github-border/50 hover:text-accent-blue hover:border-accent-blue/50 transition-colors">
                 {interaction}
               </div>
             )}
             {/* Structure label */}
             {structure && (
-              <div className="text-center text-[10px] font-bold text-slate-500 mt-0.5 hover:text-indigo-400 transition-colors">
+              <div className="text-center text-[10px] font-bold text-github-text-muted mt-0.5 hover:text-accent-blue transition-colors">
                 [{structure}]
               </div>
             )}

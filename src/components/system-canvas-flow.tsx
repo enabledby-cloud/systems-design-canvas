@@ -224,7 +224,7 @@ function SystemCanvasInner() {
   );
 
   return (
-    <div className="flex h-screen w-full bg-slate-950 font-sans text-slate-200 overflow-hidden">
+    <div className="flex h-screen w-full bg-github-bg font-sans text-github-text overflow-hidden">
       <div className="flex-1 flex flex-col relative">
         <TopBar />
         <Breadcrumbs />
@@ -247,10 +247,10 @@ function SystemCanvasInner() {
             maxZoom={4}
             snapToGrid
             snapGrid={[12, 12]}
-            connectionLineStyle={{ stroke: '#818cf8', strokeWidth: 2 }}
+            connectionLineStyle={{ stroke: '#ff5e84', strokeWidth: 2 }}
             connectionMode={ConnectionMode.Loose}
             proOptions={{ hideAttribution: true }}
-            className="bg-slate-950"
+            className="bg-github-bg"
             nodesDraggable={!flattened}
             nodesConnectable={!flattened}
             elementsSelectable={!flattened}
@@ -265,7 +265,7 @@ function SystemCanvasInner() {
               variant={BackgroundVariant.Dots}
               gap={24}
               size={1}
-              color="#334155"
+              color="#30363D"
             />
 
             {/* System Boundary overlay (only in non-flattened view) */}
@@ -280,7 +280,7 @@ function SystemCanvasInner() {
 
             {/* Zoom controls */}
             <Controls
-              className="!bg-slate-800 !border-slate-700 !rounded-lg !shadow-xl"
+              className="!bg-github-surface !border-github-border !rounded-lg !shadow-xl"
               showInteractive={false}
             />
 
@@ -288,7 +288,7 @@ function SystemCanvasInner() {
             <Panel position="bottom-right" className="!m-4 flex flex-col items-end gap-2">
               <button
                 onClick={() => setShowMinimap(!showMinimap)}
-                className="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg shadow-xl text-slate-400 hover:text-white transition-colors"
+                className="p-2 bg-github-surface hover:bg-github-elevated border border-github-border rounded-lg shadow-xl text-github-text-secondary hover:text-github-text transition-colors"
                 title={showMinimap ? 'Hide Minimap' : 'Show Minimap'}
                 aria-label={showMinimap ? 'Hide Minimap' : 'Show Minimap'}
               >
@@ -296,12 +296,12 @@ function SystemCanvasInner() {
               </button>
               {showMinimap && (
                 <MiniMap
-                  className="!bg-slate-800 !border-slate-700 !rounded-lg !relative !m-0"
+                  className="!bg-github-surface !border-github-border !rounded-lg !relative !m-0"
                   nodeColor={(node) => {
                     const data = node.data as SystemFlowNode['data'];
-                    return data?.isExternal ? '#64748b' : '#6366f1';
+                    return data?.isExternal ? '#8B949E' : '#3e8bff';
                   }}
-                  maskColor="rgba(15, 23, 42, 0.8)"
+                  maskColor="rgba(13, 17, 23, 0.8)"
                   pannable
                   zoomable
                 />

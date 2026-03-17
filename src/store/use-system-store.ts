@@ -1,5 +1,5 @@
 /**
- * Main Zustand store for SysWeaver canvas state.
+ * Main Zustand store for System canvas state.
  * Manages system data, navigation, canvas transform, and all interactions.
  */
 

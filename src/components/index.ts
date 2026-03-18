@@ -20,6 +20,7 @@ export {
   SystemLibraryModal,
   ExportJsonModal,
   ImportJsonModal,
+  EntityPickerModal,
 } from './modals';
 
 // Main canvas component (React Flow version)

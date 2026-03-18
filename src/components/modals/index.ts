@@ -8,3 +8,4 @@ export { ClearAllModal } from './clear-all-modal';
 export { SystemLibraryModal } from './system-library-modal';
 export { ExportJsonModal } from './export-json-modal';
 export { ImportJsonModal } from './import-json-modal';
+export { EntityPickerModal } from './entity-picker-modal';

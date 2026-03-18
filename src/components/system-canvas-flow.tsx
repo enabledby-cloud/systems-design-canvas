@@ -52,6 +52,7 @@ import {
   SystemLibraryModal,
   ExportJsonModal,
   ImportJsonModal,
+  EntityPickerModal,
 } from '@/components';
 import { SystemBoundary } from './canvas/system-boundary';
 import { LayeredModeIndicator } from './canvas/layered-mode-indicator';
@@ -339,6 +340,7 @@ function SystemCanvasInner() {
       <SystemLibraryModal />
       <ExportJsonModal />
       <ImportJsonModal />
+      <EntityPickerModal />
     </div>
   );
 }

@@ -19,6 +19,16 @@ import type {
 import { generateId, getBoundsRecursive, NODE_WIDTH, NODE_BASE_HEIGHT, PORT_SPACING } from '@/utils';
 import { StorageService, type SavedSystemMeta } from '@/utils/storage-service';
 import { initialSystemData } from './initial-data';
+import {
+  ENTITY_DATABASE,
+  type EntityCategory,
+  type EntityTemplate,
+  instantiateEntity,
+  instantiateEntities,
+  getTemplate,
+  searchTemplates,
+  flattenCategories,
+} from '@/data';
 
 /** Store state interface */
 interface SystemState {
@@ -101,6 +111,18 @@ interface SystemState {
   loadDefaultSystem: () => void;
   autoSave: () => void;
   markUnsaved: () => void;
+
+  // Entity database state
+  isEntityPickerOpen: boolean;
+  entitySearchQuery: string;
+  
+  // Entity database actions
+  setIsEntityPickerOpen: (open: boolean) => void;
+  setEntitySearchQuery: (query: string) => void;
+  getEntityDatabase: () => EntityCategory[];
+  searchEntityTemplates: (query: string) => EntityTemplate[];
+  addEntityFromTemplate: (templateId: string, x?: number, y?: number) => SystemNode | undefined;
+  addEntitiesFromTemplates: (templateIds: string[], startX?: number, startY?: number) => SystemNode[];
 }
 
 /**
@@ -127,6 +149,8 @@ export const useSystemStore = create<SystemState>((set, get) => ({
   savedSystems: [],
   hasUnsavedChanges: false,
   lastSavedAt: null,
+  isEntityPickerOpen: false,
+  entitySearchQuery: '',
 
   // Computed getters
   getCurrentSystem: () => {
@@ -656,5 +680,88 @@ export const useSystemStore = create<SystemState>((set, get) => ({
 
   markUnsaved: () => {
     set({ hasUnsavedChanges: true });
+  },
+
+  // Entity database actions
+  setIsEntityPickerOpen: (open) => set({ isEntityPickerOpen: open }),
+  
+  setEntitySearchQuery: (query) => set({ entitySearchQuery: query }),
+  
+  getEntityDatabase: () => ENTITY_DATABASE,
+  
+  searchEntityTemplates: (query) => {
+    if (!query.trim()) {
+      return flattenCategories(ENTITY_DATABASE).map(({ template }) => template);
+    }
+    return searchTemplates(ENTITY_DATABASE, query);
+  },
+  
+  addEntityFromTemplate: (templateId, x, y) => {
+    const template = getTemplate(templateId);
+    if (!template) return undefined;
+    
+    const currentSystem = get().getCurrentSystem();
+    
+    // Calculate position if not provided
+    let posX = x;
+    let posY = y;
+    
+    if (posX === undefined || posY === undefined) {
+      const NODE_SPACING_X = 280;
+      const NODE_SPACING_Y = 200;
+      
+      if (currentSystem.nodes.length === 0) {
+        posX = posX ?? 0;
+        posY = posY ?? 0;
+      } else {
+        let maxX = -Infinity;
+        let maxY = -Infinity;
+        let rightmostY = 0;
+        
+        for (const n of currentSystem.nodes) {
+          const nodeX = n.x ?? 0;
+          const nodeY = n.y ?? 0;
+          if (nodeX > maxX) {
+            maxX = nodeX;
+            rightmostY = nodeY;
+          }
+          maxY = Math.max(maxY, nodeY);
+        }
+        
+        posX = posX ?? maxX + NODE_SPACING_X;
+        posY = posY ?? rightmostY;
+        
+        // Start a new row if too far right
+        if (posX > 1200) {
+          const minX = Math.min(...currentSystem.nodes.map(n => n.x ?? 0));
+          posX = minX;
+          posY = maxY + NODE_SPACING_Y;
+        }
+      }
+    }
+    
+    const { node } = instantiateEntity(template, posX, posY);
+    
+    get().updateCurrentSystem((sys) => {
+      sys.nodes.push(node);
+    });
+    
+    return node;
+  },
+  
+  addEntitiesFromTemplates: (templateIds, startX = 0, startY = 0) => {
+    const templates = templateIds
+      .map(id => getTemplate(id))
+      .filter((t): t is EntityTemplate => t !== undefined);
+    
+    if (templates.length === 0) return [];
+    
+    const nodes = instantiateEntities(templates, startX, startY);
+    
+    get().updateCurrentSystem((sys) => {
+      sys.nodes.push(...nodes);
+    });
+    
+    return nodes;
   },
 }));

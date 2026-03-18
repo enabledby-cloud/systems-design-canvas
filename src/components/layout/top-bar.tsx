@@ -5,7 +5,7 @@
  * Updated to work with React Flow (no canvas ref needed).
  */
 
-import { GitCommit, Plus, Trash2, ArrowLeft, Layers, Save, FolderOpen, Download, Upload } from 'lucide-react';
+import { GitCommit, Plus, Trash2, ArrowLeft, Layers, Save, FolderOpen, Download, Upload, Sparkles } from 'lucide-react';
 import { useSystemStore } from '@/store';
 
 export function TopBar() {
@@ -24,6 +24,7 @@ export function TopBar() {
     setIsLibraryModalOpen,
     setIsExportModalOpen,
     setIsImportModalOpen,
+    setIsEntityPickerOpen,
   } = useSystemStore();
 
   const flattened = isFlattened();
@@ -119,11 +120,20 @@ export function TopBar() {
         {!flattened && (
           <>
             <button
+              onClick={() => setIsEntityPickerOpen(true)}
+              className="flex items-center space-x-1 bg-gradient-to-r from-accent-blue to-accent-purple hover:from-accent-blue/80 hover:to-accent-purple/80 text-white px-3 py-1.5 rounded-md text-sm transition-all shadow-glow-blue/50 hover:shadow-glow-purple"
+              title="Browse entity templates"
+            >
+              <Sparkles size={16} />
+              <span className="hidden sm:inline">Templates</span>
+            </button>
+            <button
               onClick={handleAddEntity}
               className="flex items-center space-x-1 bg-accent-blue hover:bg-accent-blue/80 text-white px-3 py-1.5 rounded-md text-sm transition-colors shadow-glow-blue/50 hover:shadow-glow-blue"
+              title="Add blank entity"
             >
               <Plus size={16} />
-              <span className="hidden sm:inline">Add Entity</span>
+              <span className="hidden sm:inline">Blank</span>
             </button>
             <button
               onClick={() => setIsClearModalOpen(true)}

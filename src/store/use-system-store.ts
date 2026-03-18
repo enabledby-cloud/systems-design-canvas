@@ -20,15 +20,42 @@ import { generateId, getBoundsRecursive, NODE_WIDTH, NODE_BASE_HEIGHT, PORT_SPAC
 import { StorageService, type SavedSystemMeta } from '@/utils/storage-service';
 import { initialSystemData } from './initial-data';
 import {
-  ENTITY_DATABASE,
   type EntityCategory,
   type EntityTemplate,
   instantiateEntity,
   instantiateEntities,
-  getTemplate,
-  searchTemplates,
   flattenCategories,
+  searchTemplates,
+  getTemplateById,
 } from '@/data';
+
+// Lazy-loaded entity database cache
+let cachedEntityDatabase: EntityCategory[] | null = null;
+let entityDatabasePromise: Promise<EntityCategory[]> | null = null;
+
+/**
+ * Lazily loads the entity database (code-split for smaller initial bundle).
+ */
+async function getEntityDatabaseAsync(): Promise<EntityCategory[]> {
+  if (cachedEntityDatabase) return cachedEntityDatabase;
+  
+  if (!entityDatabasePromise) {
+    entityDatabasePromise = import('@/data/entity-templates').then((module) => {
+      cachedEntityDatabase = module.ENTITY_DATABASE;
+      return cachedEntityDatabase;
+    });
+  }
+  
+  return entityDatabasePromise;
+}
+
+/**
+ * Gets the entity database synchronously (returns cached or empty).
+ * Use getEntityDatabaseAsync for guaranteed data.
+ */
+function getEntityDatabaseSync(): EntityCategory[] {
+  return cachedEntityDatabase ?? [];
+}
 
 /** Store state interface */
 interface SystemState {
@@ -111,13 +138,17 @@ interface SystemState {
   loadDefaultSystem: () => void;
   autoSave: () => void;
   markUnsaved: () => void;
+  initializeFromStorage: (data: SystemData) => void;
+  markAutoSaved: () => void;
 
   // Entity database state
   isEntityPickerOpen: boolean;
+  isEntityDatabaseLoading: boolean;
   entitySearchQuery: string;
   
   // Entity database actions
   setIsEntityPickerOpen: (open: boolean) => void;
+  loadEntityDatabase: () => Promise<void>;
   setEntitySearchQuery: (query: string) => void;
   getEntityDatabase: () => EntityCategory[];
   searchEntityTemplates: (query: string) => EntityTemplate[];
@@ -126,10 +157,10 @@ interface SystemState {
 }
 
 /**
- * Deep clones an object using JSON serialization.
+ * Deep clones an object using native structuredClone (faster than JSON serialization).
  */
 function deepClone<T>(obj: T): T {
-  return JSON.parse(JSON.stringify(obj));
+  return structuredClone(obj);
 }
 
 export const useSystemStore = create<SystemState>((set, get) => ({
@@ -150,6 +181,7 @@ export const useSystemStore = create<SystemState>((set, get) => ({
   hasUnsavedChanges: false,
   lastSavedAt: null,
   isEntityPickerOpen: false,
+  isEntityDatabaseLoading: false,
   entitySearchQuery: '',
 
   // Computed getters
@@ -682,22 +714,59 @@ export const useSystemStore = create<SystemState>((set, get) => ({
     set({ hasUnsavedChanges: true });
   },
 
+  initializeFromStorage: (data) => {
+    set({
+      systemData: data,
+      currentPath: [],
+      viewDepth: 0,
+      currentSaveId: null,
+      hasUnsavedChanges: false,
+      lastSavedAt: null,
+      jsonError: null,
+    });
+  },
+
+  markAutoSaved: () => {
+    // Mark as saved to current storage (not library)
+    // Don't clear hasUnsavedChanges since it's not saved to library yet
+  },
+
   // Entity database actions
-  setIsEntityPickerOpen: (open) => set({ isEntityPickerOpen: open }),
+  setIsEntityPickerOpen: (open) => {
+    set({ isEntityPickerOpen: open });
+    // Start loading entity database when opening picker
+    if (open && !cachedEntityDatabase) {
+      get().loadEntityDatabase();
+    }
+  },
+  
+  loadEntityDatabase: async () => {
+    if (cachedEntityDatabase) return;
+    set({ isEntityDatabaseLoading: true });
+    try {
+      await getEntityDatabaseAsync();
+    } finally {
+      set({ isEntityDatabaseLoading: false });
+    }
+  },
   
   setEntitySearchQuery: (query) => set({ entitySearchQuery: query }),
   
-  getEntityDatabase: () => ENTITY_DATABASE,
+  getEntityDatabase: () => getEntityDatabaseSync(),
   
   searchEntityTemplates: (query) => {
+    const database = getEntityDatabaseSync();
+    if (database.length === 0) return [];
+    
     if (!query.trim()) {
-      return flattenCategories(ENTITY_DATABASE).map(({ template }) => template);
+      return flattenCategories(database).map(({ template }) => template);
     }
-    return searchTemplates(ENTITY_DATABASE, query);
+    return searchTemplates(database, query);
   },
   
   addEntityFromTemplate: (templateId, x, y) => {
-    const template = getTemplate(templateId);
+    const database = getEntityDatabaseSync();
+    const template = getTemplateById(database, templateId);
     if (!template) return undefined;
     
     const currentSystem = get().getCurrentSystem();
@@ -750,8 +819,9 @@ export const useSystemStore = create<SystemState>((set, get) => ({
   },
   
   addEntitiesFromTemplates: (templateIds, startX = 0, startY = 0) => {
+    const database = getEntityDatabaseSync();
     const templates = templateIds
-      .map(id => getTemplate(id))
+      .map(id => getTemplateById(database, id))
       .filter((t): t is EntityTemplate => t !== undefined);
     
     if (templates.length === 0) return [];

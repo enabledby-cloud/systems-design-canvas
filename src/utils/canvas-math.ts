@@ -1,6 +1,6 @@
 /**
  * Canvas math utilities for System (enabledby.cloud/system).
- * Contains Bezier curve calculations, ID generation, and bounding box math.
+ * Contains ID generation and bounding box math for flattened view.
  */
 
 import type { BoundingBox, SystemNode, NodeMap, BoundsCache, Port } from '@/types';
@@ -8,20 +8,11 @@ import type { BoundingBox, SystemNode, NodeMap, BoundsCache, Port } from '@/type
 /** Node width constant in pixels */
 export const NODE_WIDTH = 220;
 
-/** Node header height in pixels */
-export const NODE_HEADER_HEIGHT = 40;
-
-/** Node function box height in pixels */
-export const NODE_FUNCTION_HEIGHT = 40;
-
 /** Port spacing in pixels */
 export const PORT_SPACING = 32;
 
 /** Base node height (header + function box + padding) */
 export const NODE_BASE_HEIGHT = 116;
-
-/** Port connector offset from edge */
-export const PORT_OFFSET = 8;
 
 /**
  * Generates a unique ID with a given prefix.
@@ -30,43 +21,6 @@ export const PORT_OFFSET = 8;
  */
 export function generateId(prefix: string): string {
   return `${prefix}_${Math.random().toString(36).substring(2, 11)}`;
-}
-
-/**
- * Calculates the SVG path for a Bezier curve between two points.
- * Handles both forward and backward connections with appropriate curve offsets.
- *
- * @param startX - Starting X coordinate (output port)
- * @param startY - Starting Y coordinate
- * @param endX - Ending X coordinate (input port)
- * @param endY - Ending Y coordinate
- * @returns SVG path data string for the Bezier curve
- */
-export function calculateBezier(
-  startX: number,
-  startY: number,
-  endX: number,
-  endY: number
-): string {
-  const adjustedStartX = startX + PORT_OFFSET;
-  const adjustedEndX = endX - PORT_OFFSET;
-
-  const dx = adjustedEndX - adjustedStartX;
-  const dy = Math.abs(endY - startY);
-  const isBackwards = dx < 0;
-
-  let curveOffset = isBackwards
-    ? Math.max(120, dy * 0.6 + Math.abs(dx) * 0.2)
-    : Math.max(dx * 0.5, 60);
-
-  if (!isBackwards && dy > 100) {
-    curveOffset += Math.min(dy * 0.25, 100);
-  }
-
-  const cp1x = adjustedStartX + curveOffset;
-  const cp2x = adjustedEndX - curveOffset;
-
-  return `M ${adjustedStartX} ${startY} C ${cp1x} ${startY}, ${cp2x} ${endY}, ${adjustedEndX} ${endY}`;
 }
 
 /**
@@ -79,22 +33,6 @@ export function calculateBezier(
 export function calculateNodeHeight(inputs: Port[], outputs: Port[]): number {
   const portCount = Math.max(inputs.length, outputs.length);
   return NODE_BASE_HEIGHT + portCount * PORT_SPACING;
-}
-
-/**
- * Calculates the bounding box for a node.
- *
- * @param node - The node to calculate bounds for
- * @returns Bounding box with min/max coordinates
- */
-export function getNodeBounds(node: SystemNode): BoundingBox {
-  const height = calculateNodeHeight(node.inputs, node.outputs);
-  return {
-    minX: 0,
-    minY: 0,
-    maxX: NODE_WIDTH,
-    maxY: height,
-  };
 }
 
 /**

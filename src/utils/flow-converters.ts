@@ -1,15 +1,12 @@
 /**
  * Conversion utilities between SystemData format and React Flow format.
- * Handles bidirectional conversion for seamless integration.
+ * One-way conversion from System domain model to React Flow rendering format.
  */
 
-import type { Node, Edge } from '@xyflow/react';
 import type {
   SystemNode,
   SystemEdge,
   InternalSystem,
-  SystemNodeData,
-  SystemEdgeData,
   SystemFlowNode,
   SystemFlowEdge,
 } from '@/types';
@@ -37,26 +34,6 @@ export function systemNodeToFlowNode(node: SystemNode): SystemFlowNode {
 }
 
 /**
- * Converts a React Flow Node back to a SystemNode.
- */
-export function flowNodeToSystemNode(node: SystemFlowNode): SystemNode {
-  return {
-    id: node.id,
-    name: node.data.name,
-    process: node.data.process,
-    operand: node.data.operand,
-    isExternal: node.data.isExternal,
-    emergence: node.data.emergence,
-    x: node.position.x,
-    y: node.position.y,
-    inputs: node.data.inputs,
-    outputs: node.data.outputs,
-    internal: node.data.internal,
-    isNew: node.data.isNew,
-  };
-}
-
-/**
  * Converts a SystemEdge to a React Flow Edge.
  */
 export function systemEdgeToFlowEdge(edge: SystemEdge): SystemFlowEdge {
@@ -68,39 +45,11 @@ export function systemEdgeToFlowEdge(edge: SystemEdge): SystemFlowEdge {
     sourceHandle: edge.fromPort,
     targetHandle: edge.toPort,
     data: {
-      interaction: edge.interaction || edge.label,
+      interaction: edge.interaction,
       structure: edge.structure,
       sourceHandleId: edge.fromPort,
       targetHandleId: edge.toPort,
     },
-  };
-}
-
-/**
- * Converts a React Flow Edge back to a SystemEdge.
- */
-export function flowEdgeToSystemEdge(edge: SystemFlowEdge): SystemEdge {
-  return {
-    id: edge.id,
-    fromNode: edge.source,
-    fromPort: edge.sourceHandle || edge.data?.sourceHandleId || '',
-    toNode: edge.target,
-    toPort: edge.targetHandle || edge.data?.targetHandleId || '',
-    interaction: edge.data?.interaction,
-    structure: edge.data?.structure,
-  };
-}
-
-/**
- * Converts an entire InternalSystem to React Flow nodes and edges.
- */
-export function systemToFlow(system: InternalSystem): {
-  nodes: SystemFlowNode[];
-  edges: SystemFlowEdge[];
-} {
-  return {
-    nodes: system.nodes.map(systemNodeToFlowNode),
-    edges: system.edges.map(systemEdgeToFlowEdge),
   };
 }
 
@@ -227,18 +176,5 @@ export function flattenedViewToFlow(flattenedView: {
   return {
     nodes: [...groupNodes, ...systemNodes],
     edges,
-  };
-}
-
-/**
- * Converts React Flow nodes and edges back to an InternalSystem.
- */
-export function flowToSystem(
-  nodes: SystemFlowNode[],
-  edges: SystemFlowEdge[]
-): InternalSystem {
-  return {
-    nodes: nodes.map(flowNodeToSystemNode),
-    edges: edges.map(flowEdgeToSystemEdge),
   };
 }

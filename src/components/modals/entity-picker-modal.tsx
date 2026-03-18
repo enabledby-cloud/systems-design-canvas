@@ -5,7 +5,7 @@
  * Features hierarchical category navigation, search, and template preview.
  */
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import {
   X,
   Search,
@@ -21,6 +21,8 @@ import {
   Layers,
   Tag,
   Sparkles,
+  Loader2,
+  CheckCircle,
 } from 'lucide-react';
 import { useSystemStore } from '@/store';
 import {
@@ -232,13 +234,23 @@ export function EntityPickerModal() {
     searchEntityTemplates,
     addEntityFromTemplate,
     isFlattened,
+    isEntityDatabaseLoading,
   } = useSystemStore();
 
   const [selectedCategory, setSelectedCategory] = useState<EntityCategory | null>(null);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set(['stocks_flows', 'feedback', 'archetypes']));
+  const [addedToast, setAddedToast] = useState<{ name: string; id: number } | null>(null);
 
   const database = getEntityDatabase();
   const flattened = isFlattened();
+
+  // Auto-hide toast after 2 seconds
+  useEffect(() => {
+    if (addedToast) {
+      const timer = setTimeout(() => setAddedToast(null), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [addedToast]);
 
   const handleClose = useCallback(() => {
     setIsEntityPickerOpen(false);
@@ -283,7 +295,10 @@ export function EntityPickerModal() {
 
   const handleAdd = useCallback(
     (templateId: string) => {
-      addEntityFromTemplate(templateId);
+      const node = addEntityFromTemplate(templateId);
+      if (node) {
+        setAddedToast({ name: node.name, id: Date.now() });
+      }
     },
     [addEntityFromTemplate]
   );
@@ -303,7 +318,7 @@ export function EntityPickerModal() {
         <div className="flex items-center justify-between px-6 py-4 border-b border-github-border shrink-0">
           <div className="flex items-center gap-3">
             <Sparkles className="text-accent-blue" size={24} />
-            <h2 className="text-lg font-semibold gradient-text-primary">Entity Templates</h2>
+            <h2 className="text-lg font-semibold gradient-text-primary">Entity Library</h2>
           </div>
           <button
             onClick={handleClose}
@@ -328,7 +343,7 @@ export function EntityPickerModal() {
             />
             <input
               type="text"
-              placeholder="Search templates by name, tags, or function..."
+              placeholder="Search entities by name, tags, or function..."
               value={entitySearchQuery}
               onChange={(e) => setEntitySearchQuery(e.target.value)}
               className="w-full bg-github-bg border border-github-border rounded-lg pl-9 pr-4 py-2.5 text-sm text-github-text placeholder:text-github-text-muted focus:outline-none focus:border-accent-blue"
@@ -339,73 +354,96 @@ export function EntityPickerModal() {
 
         {/* Main Content */}
         <div className="flex flex-1 min-h-0">
-          {/* Category Sidebar */}
-          <div className="w-64 border-r border-github-border overflow-y-auto p-3 shrink-0">
-            <div className="mb-2">
-              <button
-                onClick={() => setSelectedCategory(null)}
-                className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors ${
-                  !selectedCategory && !entitySearchQuery
-                    ? 'bg-accent-blue/20 text-accent-blue border border-accent-blue/30'
-                    : 'text-github-text-secondary hover:bg-github-elevated hover:text-github-text'
-                }`}
-              >
-                <Box size={16} />
-                <span>All Templates</span>
-                <span className="ml-auto text-xs text-github-text-muted">
-                  {flattenCategories(database).length}
-                </span>
-              </button>
+          {isEntityDatabaseLoading ? (
+            <div className="flex-1 flex flex-col items-center justify-center gap-4">
+              <Loader2 size={48} className="animate-spin text-accent-blue" />
+              <div className="text-center">
+                <p className="text-github-text font-medium">Loading Entity Library</p>
+                <p className="text-sm text-github-text-secondary mt-1">Preparing systems thinking entities...</p>
+              </div>
             </div>
+          ) : (
+            <>
+              {/* Category Sidebar */}
+              <div className="w-64 border-r border-github-border overflow-y-auto p-3 shrink-0">
+                <div className="mb-2">
+                  <button
+                    onClick={() => setSelectedCategory(null)}
+                    className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors ${
+                      !selectedCategory && !entitySearchQuery
+                        ? 'bg-accent-blue/20 text-accent-blue border border-accent-blue/30'
+                        : 'text-github-text-secondary hover:bg-github-elevated hover:text-github-text'
+                    }`}
+                  >
+                    <Box size={16} />
+                    <span>All Entities</span>
+                    <span className="ml-auto text-xs text-github-text-muted">
+                      {flattenCategories(database).length}
+                    </span>
+                  </button>
+                </div>
 
-            <div className="h-px bg-github-border my-2" />
+                <div className="h-px bg-github-border my-2" />
 
-            {database.map((category) => (
-              <CategoryTreeItem
-                key={category.id}
-                category={category}
-                selectedCategoryId={selectedCategory?.id ?? null}
-                onSelect={setSelectedCategory}
-                expandedIds={expandedIds}
-                onToggleExpand={toggleExpand}
-              />
-            ))}
-          </div>
-
-          {/* Template Grid */}
-          <div className="flex-1 overflow-y-auto p-4">
-            {entitySearchQuery && (
-              <div className="mb-4 text-sm text-github-text-secondary">
-                Found {displayTemplates.length} template{displayTemplates.length !== 1 ? 's' : ''} matching "{entitySearchQuery}"
-              </div>
-            )}
-
-            {displayTemplates.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-github-text-muted">
-                <Box size={48} className="mb-4 opacity-50" />
-                <p className="text-lg">No templates found</p>
-                <p className="text-sm">Try a different search or category</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {displayTemplates.map((template) => (
-                  <TemplateCard
-                    key={template.templateId}
-                    template={template}
-                    onAdd={flattened ? () => {} : handleAdd}
+                {database.map((category) => (
+                  <CategoryTreeItem
+                    key={category.id}
+                    category={category}
+                    selectedCategoryId={selectedCategory?.id ?? null}
+                    onSelect={setSelectedCategory}
+                    expandedIds={expandedIds}
+                    onToggleExpand={toggleExpand}
                   />
                 ))}
               </div>
-            )}
-          </div>
+
+              {/* Template Grid */}
+              <div className="flex-1 overflow-y-auto p-4">
+                {entitySearchQuery && (
+                  <div className="mb-4 text-sm text-github-text-secondary">
+                    Found {displayTemplates.length} entit{displayTemplates.length !== 1 ? 'ies' : 'y'} matching "{entitySearchQuery}"
+                  </div>
+                )}
+
+                {displayTemplates.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-github-text-muted">
+                    <Box size={48} className="mb-4 opacity-50" />
+                    <p className="text-lg">No entities found</p>
+                    <p className="text-sm">Try a different search or category</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {displayTemplates.map((template) => (
+                      <TemplateCard
+                        key={template.templateId}
+                        template={template}
+                        onAdd={flattened ? () => {} : handleAdd}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3 border-t border-github-border shrink-0 flex items-center justify-between text-xs text-github-text-muted">
+        <div className="px-6 py-3 border-t border-github-border shrink-0 flex items-center justify-between text-xs text-github-text-muted relative">
           <span>
-            {displayTemplates.length} template{displayTemplates.length !== 1 ? 's' : ''} available
+            {displayTemplates.length} entit{displayTemplates.length !== 1 ? 'ies' : 'y'} available
           </span>
           <span>Click + to add an entity to the canvas</span>
+
+          {/* Added Toast Notification */}
+          {addedToast && (
+            <div
+              key={addedToast.id}
+              className="absolute left-1/2 -translate-x-1/2 -top-12 flex items-center gap-2 px-4 py-2 bg-accent-green/20 border border-accent-green/40 text-accent-green rounded-lg text-sm font-medium shadow-lg animate-in"
+            >
+              <CheckCircle size={16} />
+              <span>Added "{addedToast.name}" to canvas</span>
+            </div>
+          )}
         </div>
       </div>
     </div>

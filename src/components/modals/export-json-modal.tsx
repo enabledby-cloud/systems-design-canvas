@@ -9,6 +9,7 @@ import { X, Copy, Check, Download } from 'lucide-react';
 import { useSystemStore } from '@/store';
 import { StorageService } from '@/utils/storage-service';
 import { useEscapeKey } from '@/utils/use-escape-key';
+import { Button } from '@/components/ui';
 
 export function ExportJsonModal() {
   const { systemData, isExportModalOpen, setIsExportModalOpen } = useSystemStore();
@@ -54,24 +55,19 @@ export function ExportJsonModal() {
             <h2 className="text-lg font-semibold gradient-text-primary">Export System JSON</h2>
           </div>
           <div className="flex items-center gap-2">
-            <button
+            <Button
+              variant={copied ? 'secondary' : 'ghost'}
+              size="sm"
               onClick={handleCopy}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors ${
-                copied
-                  ? 'bg-accent-green/20 text-accent-green border border-accent-green/30'
-                  : 'bg-github-elevated hover:bg-github-border text-github-text border border-github-border'
-              }`}
+              className={copied ? 'bg-accent-green/20 text-accent-green border-accent-green/30' : ''}
             >
               {copied ? <Check size={16} /> : <Copy size={16} />}
               {copied ? 'Copied!' : 'Copy'}
-            </button>
-            <button
-              onClick={handleDownload}
-              className="flex items-center gap-2 px-3 py-1.5 bg-accent-blue hover:bg-accent-blue/80 text-white rounded-lg text-sm transition-colors"
-            >
+            </Button>
+            <Button variant="primary" size="sm" onClick={handleDownload}>
               <Download size={16} />
               Download
-            </button>
+            </Button>
             <button
               onClick={handleClose}
               className="p-2 hover:bg-github-elevated rounded-lg transition-colors text-github-text-secondary hover:text-github-text"

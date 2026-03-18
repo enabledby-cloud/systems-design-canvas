@@ -22,6 +22,7 @@ import {
 import { useSystemStore } from '@/store';
 import { StorageService, type SavedSystemMeta } from '@/utils/storage-service';
 import { useEscapeKey } from '@/utils/use-escape-key';
+import { Button } from '@/components/ui';
 
 type SortKey = 'name' | 'updatedAt' | 'nodeCount';
 type SortOrder = 'asc' | 'desc';
@@ -152,7 +153,7 @@ export function SystemLibraryModal() {
         <div className="flex items-center justify-between px-6 py-4 border-b border-github-border">
           <div className="flex items-center gap-3">
             <FolderOpen className="text-accent-blue" size={24} />
-            <h2 className="text-lg font-semibold gradient-text-primary">System Library</h2>
+            <h2 className="text-lg font-semibold gradient-text-primary">Systems</h2>
           </div>
           <button
             onClick={handleClose}
@@ -178,22 +179,20 @@ export function SystemLibraryModal() {
             />
           </div>
 
-          <button
-            onClick={handleNewSystem}
-            className="flex items-center gap-2 px-3 py-2 bg-accent-blue hover:bg-accent-blue/80 text-white rounded-lg text-sm transition-colors"
-          >
+          <Button variant="primary" size="sm" onClick={handleNewSystem}>
             <Plus size={16} />
             <span>New</span>
-          </button>
+          </Button>
 
-          <button
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={handleLoadDefault}
-            className="flex items-center gap-2 px-3 py-2 bg-github-elevated hover:bg-github-border text-github-text rounded-lg text-sm transition-colors border border-github-border"
             title="Load the example Engineering Support System"
           >
             <Sparkles size={16} className="text-accent-orange" />
             <span>Demo</span>
-          </button>
+          </Button>
         </div>
 
         {/* Sort Controls */}
@@ -231,20 +230,14 @@ export function SystemLibraryModal() {
                     Save your current system or create a new one to get started.
                   </p>
                   <div className="flex gap-3">
-                    <button
-                      onClick={handleNewSystem}
-                      className="flex items-center gap-2 px-4 py-2 bg-accent-blue hover:bg-accent-blue/80 text-white rounded-lg text-sm transition-colors"
-                    >
+                    <Button variant="primary" onClick={handleNewSystem}>
                       <Plus size={16} />
                       New System
-                    </button>
-                    <button
-                      onClick={handleLoadDefault}
-                      className="flex items-center gap-2 px-4 py-2 bg-github-elevated hover:bg-github-border text-github-text rounded-lg text-sm transition-colors border border-github-border"
-                    >
+                    </Button>
+                    <Button variant="secondary" onClick={handleLoadDefault}>
                       <Sparkles size={16} className="text-accent-orange" />
                       Load Demo
-                    </button>
+                    </Button>
                   </div>
                 </>
               ) : (

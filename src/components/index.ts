@@ -2,8 +2,11 @@
  * Components barrel export.
  */
 
+// UI primitives
+export * from './ui';
+
 // Layout
-export { TopBar, Breadcrumbs, JsonEditor } from './layout';
+export { TopBar, Breadcrumbs } from './layout';
 
 // Canvas overlays
 export { SystemBoundary, LayeredModeIndicator } from './canvas';

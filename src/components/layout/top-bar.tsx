@@ -62,10 +62,10 @@ export function TopBar() {
           <button
             onClick={() => setIsLibraryModalOpen(true)}
             className="flex items-center space-x-1 bg-github-bg text-github-text-secondary hover:bg-github-elevated hover:text-github-text px-2.5 py-1.5 rounded-md text-sm transition-colors border border-github-border"
-            title="Open system library"
+            title="Open saved systems"
           >
             <FolderOpen size={16} />
-            <span className="hidden md:inline">Library</span>
+            <span className="hidden md:inline">Systems</span>
           </button>
           <button
             onClick={() => setIsExportModalOpen(true)}
@@ -122,10 +122,10 @@ export function TopBar() {
             <button
               onClick={() => setIsEntityPickerOpen(true)}
               className="flex items-center space-x-1 bg-gradient-to-r from-accent-blue to-accent-purple hover:from-accent-blue/80 hover:to-accent-purple/80 text-white px-3 py-1.5 rounded-md text-sm transition-all shadow-glow-blue/50 hover:shadow-glow-purple"
-              title="Browse entity templates"
+              title="Browse entity library"
             >
               <Sparkles size={16} />
-              <span className="hidden sm:inline">Templates</span>
+              <span className="hidden sm:inline">Entities</span>
             </button>
             <button
               onClick={handleAddEntity}

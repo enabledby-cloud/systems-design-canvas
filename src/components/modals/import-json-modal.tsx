@@ -9,6 +9,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { X, Upload, AlertCircle, CheckCircle, FileUp, Info } from 'lucide-react';
 import { useSystemStore } from '@/store';
 import { useEscapeKey } from '@/utils/use-escape-key';
+import { Button } from '@/components/ui';
 import type { SystemData } from '@/types';
 
 /** Validation result */
@@ -594,20 +595,13 @@ Required schema:
             Press Esc to close
           </span>
           <div className="flex items-center gap-3">
-            <button
-              onClick={handleClose}
-              className="px-4 py-2 text-sm text-github-text-secondary hover:text-github-text hover:bg-github-elevated rounded-lg transition-colors"
-            >
+            <Button variant="secondary" onClick={handleClose}>
               Cancel
-            </button>
-            <button
-              onClick={handleImport}
-              disabled={!canImport}
-              className="flex items-center gap-2 px-4 py-2 bg-accent-blue hover:bg-accent-blue/80 disabled:bg-github-elevated disabled:text-github-text-muted text-white rounded-lg text-sm font-medium transition-colors disabled:cursor-not-allowed"
-            >
+            </Button>
+            <Button variant="primary" onClick={handleImport} disabled={!canImport}>
               <Upload size={16} />
               Import System
-            </button>
+            </Button>
           </div>
         </div>
       </div>

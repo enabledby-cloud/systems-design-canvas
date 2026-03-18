@@ -31,12 +31,14 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { Map, X } from 'lucide-react';
+import { useShallow } from 'zustand/react/shallow';
 
 import { useSystemStore } from '@/store';
 import {
   systemToFlowWithBoundaries,
   flattenedViewToFlow,
   generateId,
+  useAutoSave,
 } from '@/utils';
 import { SystemNode } from './flow/system-node';
 import { SystemEdge } from './flow/system-edge';
@@ -83,37 +85,51 @@ function SystemCanvasInner() {
   // Minimap visibility state
   const [showMinimap, setShowMinimap] = useState(true);
 
-  // Get stable primitive values from store for dependency tracking
-  const systemData = useSystemStore((state) => state.systemData);
-  const viewDepth = useSystemStore((state) => state.viewDepth);
-  const currentPath = useSystemStore((state) => state.currentPath);
-  const hasUnsavedChanges = useSystemStore((state) => state.hasUnsavedChanges);
-  
-  // Get functions (stable references)
-  const getCurrentSystem = useSystemStore((state) => state.getCurrentSystem);
-  const isFlattened = useSystemStore((state) => state.isFlattened);
-  const getFlattenedView = useSystemStore((state) => state.getFlattenedView);
-  const updateCurrentSystem = useSystemStore((state) => state.updateCurrentSystem);
-  const createEdge = useSystemStore((state) => state.createEdge);
-  const autoSave = useSystemStore((state) => state.autoSave);
-  const refreshSavedSystems = useSystemStore((state) => state.refreshSavedSystems);
+  // Combined state selector using useShallow for better performance
+  const {
+    systemData,
+    viewDepth,
+    currentPath,
+    hasUnsavedChanges,
+    getCurrentSystem,
+    isFlattened,
+    getFlattenedView,
+    updateCurrentSystem,
+    createEdge,
+    refreshSavedSystems,
+    getParentNode,
+    initializeFromStorage,
+    markAutoSaved,
+  } = useSystemStore(
+    useShallow((state) => ({
+      systemData: state.systemData,
+      viewDepth: state.viewDepth,
+      currentPath: state.currentPath,
+      hasUnsavedChanges: state.hasUnsavedChanges,
+      getCurrentSystem: state.getCurrentSystem,
+      isFlattened: state.isFlattened,
+      getFlattenedView: state.getFlattenedView,
+      updateCurrentSystem: state.updateCurrentSystem,
+      createEdge: state.createEdge,
+      refreshSavedSystems: state.refreshSavedSystems,
+      getParentNode: state.getParentNode,
+      initializeFromStorage: state.initializeFromStorage,
+      markAutoSaved: state.markAutoSaved,
+    }))
+  );
 
-  // Auto-save to local storage periodically when there are unsaved changes
-  useEffect(() => {
-    if (!hasUnsavedChanges) return;
-    
-    const timer = setTimeout(() => {
-      autoSave();
-    }, 5000); // Auto-save after 5 seconds of inactivity
-    
-    return () => clearTimeout(timer);
-  }, [systemData, hasUnsavedChanges, autoSave]);
+  // Auto-save to local storage and recover on page load
+  useAutoSave({
+    systemData,
+    hasUnsavedChanges,
+    onRecover: initializeFromStorage,
+    onAutoSaved: markAutoSaved,
+  });
 
   // Refresh saved systems list on mount
   useEffect(() => {
     refreshSavedSystems();
   }, [refreshSavedSystems]);
-  const getParentNode = useSystemStore((state) => state.getParentNode);
 
   const flattened = isFlattened();
   const parentNode = getParentNode();

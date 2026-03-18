@@ -54,8 +54,6 @@ export interface SystemEdge {
   interaction?: string;
   /** Physical medium or structure of the connection */
   structure?: string;
-  /** @deprecated Use interaction instead */
-  label?: string;
 }
 
 /**

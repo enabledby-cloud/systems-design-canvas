@@ -7,7 +7,7 @@
 import { useCallback } from 'react';
 import { Trash2 } from 'lucide-react';
 import { useSystemStore } from '@/store';
-import { useEscapeKey } from '@/utils/use-escape-key';
+import { Modal, Button, Input, ModalFooter } from '@/components/ui';
 
 export function EdgeEditorModal() {
   const { editingEdge, setEditingEdge, saveEdge, deleteEditingEdge } =
@@ -17,9 +17,6 @@ export function EdgeEditorModal() {
     setEditingEdge(null);
   }, [setEditingEdge]);
 
-  // Close on Escape key
-  useEscapeKey(handleClose, !!editingEdge);
-
   if (!editingEdge) return null;
 
   const updateEdge = (updates: Partial<typeof editingEdge>) => {
@@ -27,69 +24,48 @@ export function EdgeEditorModal() {
   };
 
   return (
-    <div
-      className="absolute inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[1px]"
-      onClick={handleClose}
-    >
-      <div
-        className="bg-github-surface p-5 rounded-xl shadow-2xl border border-github-border w-80"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h3 className="text-sm font-semibold text-github-text mb-4 uppercase tracking-wider">
-          Edit Connection
-        </h3>
-
-        <div className="mb-4">
-          <label className="block text-xs font-semibold text-github-text-secondary mb-1">
-            Interaction (What flows)
-          </label>
-          <input
-            type="text"
-            value={editingEdge.interaction || editingEdge.label || ''}
-            onChange={(e) =>
-              updateEdge({ interaction: e.target.value, label: e.target.value })
-            }
-            placeholder="e.g. Material"
-            className="w-full bg-github-bg border border-github-border rounded px-3 py-2 text-sm text-github-text focus:outline-none focus:border-accent-blue"
-          />
-        </div>
-
-        <div className="mb-6">
-          <label className="block text-xs font-semibold text-github-text-secondary mb-1">
-            Structure (Physical medium)
-          </label>
-          <input
-            type="text"
-            value={editingEdge.structure || ''}
-            onChange={(e) => updateEdge({ structure: e.target.value })}
-            placeholder="e.g. Pipeline, Truck"
-            className="w-full bg-github-bg border border-github-border rounded px-3 py-2 text-sm text-github-text focus:outline-none focus:border-accent-blue"
-          />
-        </div>
-
-        <div className="flex justify-between items-center">
-          <button
+    <Modal
+      isOpen={!!editingEdge}
+      onClose={handleClose}
+      title="Edit Connection"
+      size="sm"
+      footer={
+        <ModalFooter align="between">
+          <Button
+            variant="ghost"
+            size="sm"
+            icon={<Trash2 size={14} />}
             onClick={deleteEditingEdge}
-            className="text-xs text-accent-pink hover:text-accent-pink/80 flex items-center gap-1 p-1 rounded hover:bg-accent-pink/10 transition-colors"
+            className="text-accent-pink hover:bg-accent-pink/10"
           >
-            <Trash2 size={14} /> Delete
-          </button>
-          <div className="flex space-x-2">
-            <button
-              onClick={handleClose}
-              className="px-3 py-1.5 text-xs text-github-text-secondary hover:bg-github-elevated hover:text-github-text rounded transition-colors"
-            >
+            Delete
+          </Button>
+          <div className="flex gap-2">
+            <Button variant="ghost" size="sm" onClick={handleClose}>
               Cancel
-            </button>
-            <button
-              onClick={saveEdge}
-              className="px-3 py-1.5 text-xs bg-accent-blue hover:bg-accent-blue/80 text-white rounded transition-colors"
-            >
+            </Button>
+            <Button variant="primary" size="sm" onClick={saveEdge}>
               Save
-            </button>
+            </Button>
           </div>
-        </div>
+        </ModalFooter>
+      }
+    >
+      <div className="space-y-4">
+        <Input
+          label="Interaction (What flows)"
+          value={editingEdge.interaction || ''}
+          onChange={(e) => updateEdge({ interaction: e.target.value })}
+          placeholder="e.g. Material"
+        />
+
+        <Input
+          label="Structure (Physical medium)"
+          value={editingEdge.structure || ''}
+          onChange={(e) => updateEdge({ structure: e.target.value })}
+          placeholder="e.g. Pipeline, Truck"
+        />
       </div>
-    </div>
+    </Modal>
   );
 }

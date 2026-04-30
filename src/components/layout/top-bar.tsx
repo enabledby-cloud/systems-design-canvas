@@ -5,8 +5,9 @@
  * Updated to work with React Flow (no canvas ref needed).
  */
 
-import { GitCommit, Plus, Trash2, ArrowLeft, Layers, Save, FolderOpen, Download, Upload, Sparkles } from 'lucide-react';
+import { GitCommit, Plus, Trash2, ArrowLeft, Layers, Save, FolderOpen, Download, Upload, Sparkles, Library } from 'lucide-react';
 import { useSystemStore } from '@/store';
+import { Button } from '@/components/ui';
 
 export function TopBar() {
   const {
@@ -47,42 +48,43 @@ export function TopBar() {
 
         {/* File Actions */}
         <div className="flex items-center space-x-1">
-          <button
+          <Button
             onClick={() => saveToLibrary()}
-            className={`flex items-center space-x-1 px-2.5 py-1.5 rounded-md text-sm transition-colors ${
-              hasUnsavedChanges
-                ? 'bg-accent-blue/20 text-accent-blue hover:bg-accent-blue/30 border border-accent-blue/30'
-                : 'bg-github-bg text-github-text-secondary hover:bg-github-elevated hover:text-github-text border border-github-border'
-            }`}
+            variant={hasUnsavedChanges ? 'primary' : 'secondary'}
+            size="sm"
+            icon={<Save size={16} />}
+            className={hasUnsavedChanges ? 'bg-accent-blue/20 text-accent-blue hover:bg-accent-blue/30 border border-accent-blue/30 shadow-none' : ''}
             title={hasUnsavedChanges ? 'Save changes' : 'Already saved'}
           >
-            <Save size={16} />
             <span className="hidden md:inline">Save</span>
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setIsLibraryModalOpen(true)}
-            className="flex items-center space-x-1 bg-github-bg text-github-text-secondary hover:bg-github-elevated hover:text-github-text px-2.5 py-1.5 rounded-md text-sm transition-colors border border-github-border"
+            variant="secondary"
+            size="sm"
+            icon={<FolderOpen size={16} />}
             title="Open saved systems"
           >
-            <FolderOpen size={16} />
             <span className="hidden md:inline">Systems</span>
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setIsExportModalOpen(true)}
-            className="flex items-center space-x-1 bg-github-bg text-github-text-secondary hover:bg-github-elevated hover:text-github-text px-2.5 py-1.5 rounded-md text-sm transition-colors border border-github-border"
+            variant="secondary"
+            size="sm"
+            icon={<Download size={16} />}
             title="Export system JSON"
           >
-            <Download size={16} />
             <span className="hidden md:inline">Export</span>
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setIsImportModalOpen(true)}
-            className="flex items-center space-x-1 bg-github-bg text-github-text-secondary hover:bg-github-elevated hover:text-github-text px-2.5 py-1.5 rounded-md text-sm transition-colors border border-github-border"
+            variant="secondary"
+            size="sm"
+            icon={<Upload size={16} />}
             title="Import system JSON"
           >
-            <Upload size={16} />
             <span className="hidden md:inline">Import</span>
-          </button>
+          </Button>
         </div>
 
         <div className="h-6 w-px bg-github-border mx-2 hidden lg:block" />
@@ -92,68 +94,76 @@ export function TopBar() {
           <div className="px-2 text-xs font-semibold text-github-text-secondary uppercase tracking-wider flex items-center gap-1">
             <Layers size={14} /> Depth
           </div>
-          <button
+          <Button
             onClick={decrementViewDepth}
             disabled={viewDepth === 0}
-            className="w-6 h-6 flex items-center justify-center rounded hover:bg-github-elevated text-github-text transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+            variant="ghost"
+            size="sm"
+            className="w-6 h-6 !p-0"
             aria-label="Decrease view depth"
           >
             -
-          </button>
+          </Button>
           <div 
             className="min-w-[3rem] text-center text-sm font-mono font-bold text-accent-blue"
             title={maxDepth === 0 ? "No nested subsystems" : `Viewing depth ${viewDepth + 1} of ${maxDepth + 1} available levels`}
           >
             {viewDepth + 1}<span className="text-github-text-muted font-normal">/{maxDepth + 1}</span>
           </div>
-          <button
+          <Button
             onClick={incrementViewDepth}
             disabled={viewDepth >= maxDepth}
-            className="w-6 h-6 flex items-center justify-center rounded hover:bg-github-elevated text-github-text transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+            variant="ghost"
+            size="sm"
+            className="w-6 h-6 !p-0"
             aria-label="Increase view depth"
           >
             +
-          </button>
+          </Button>
         </div>
 
         {/* Action Buttons (only when not flattened) */}
         {!flattened && (
           <>
-            <button
+            <Button
               onClick={() => setIsEntityPickerOpen(true)}
-              className="flex items-center space-x-1 bg-gradient-to-r from-accent-blue to-accent-purple hover:from-accent-blue/80 hover:to-accent-purple/80 text-white px-3 py-1.5 rounded-md text-sm transition-all shadow-glow-blue/50 hover:shadow-glow-purple"
+              variant="primary"
+              size="sm"
+              icon={<Library size={16} />}
               title="Browse entity library"
             >
-              <Sparkles size={16} />
               <span className="hidden sm:inline">Entities</span>
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={handleAddEntity}
-              className="flex items-center space-x-1 bg-accent-blue hover:bg-accent-blue/80 text-white px-3 py-1.5 rounded-md text-sm transition-colors shadow-glow-blue/50 hover:shadow-glow-blue"
+              variant="primary"
+              size="sm"
+              icon={<Plus size={16} />}
               title="Add blank entity"
             >
-              <Plus size={16} />
-              <span className="hidden sm:inline">Blank</span>
-            </button>
-            <button
+              <span className="hidden sm:inline">Empty Component</span>
+            </Button>
+            <Button
               onClick={() => setIsClearModalOpen(true)}
-              className="flex items-center space-x-1 bg-accent-pink/20 hover:bg-accent-pink/30 text-accent-pink px-3 py-1.5 rounded-md text-sm transition-colors border border-accent-pink/30"
+              variant="danger"
+              size="sm"
+              icon={<Trash2 size={16} />}
             >
-              <Trash2 size={16} />
               <span className="hidden sm:inline">Clear All</span>
-            </button>
+            </Button>
           </>
         )}
 
         {/* Go Up Button */}
         {currentPath.length > 0 && (
-          <button
+          <Button
             onClick={() => navigateUp(currentPath.length - 1)}
-            className="flex items-center space-x-1 bg-github-elevated hover:bg-github-border text-github-text px-3 py-1.5 rounded-md text-sm transition-colors border border-github-border"
+            variant="secondary"
+            size="sm"
+            icon={<ArrowLeft size={16} />}
           >
-            <ArrowLeft size={16} />
-            <span>Go Up</span>
-          </button>
+            Go Up
+          </Button>
         )}
       </div>
     </div>

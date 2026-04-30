@@ -470,12 +470,15 @@ export function ImportJsonModal() {
             <Upload className="text-accent-blue" size={24} />
             <h2 className="text-lg font-semibold gradient-text-primary">Import System JSON</h2>
           </div>
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={handleClose}
-            className="p-2 hover:bg-github-elevated rounded-lg transition-colors text-github-text-secondary hover:text-github-text"
+            className="!p-2"
+            aria-label="Close modal"
           >
             <X size={20} />
-          </button>
+          </Button>
         </div>
 
         {/* File Upload */}

@@ -23,8 +23,10 @@ import {
   Sparkles,
   Loader2,
   CheckCircle,
+  Library,
 } from 'lucide-react';
 import { useSystemStore } from '@/store';
+import { Button } from '@/components/ui';
 import {
   type EntityCategory,
   type EntityTemplate,
@@ -166,13 +168,15 @@ function TemplateCard({
             <span className="text-github-text-muted">{template.operand}</span>
           </p>
         </div>
-        <button
+        <Button
           onClick={() => onAdd(template.templateId)}
-          className="shrink-0 p-2 bg-accent-blue/20 hover:bg-accent-blue text-accent-blue hover:text-white rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+          variant="ghost"
+          size="sm"
+          className="shrink-0 !p-2 bg-accent-blue/20 hover:bg-accent-blue text-accent-blue hover:text-white opacity-0 group-hover:opacity-100"
           title="Add to canvas"
         >
           <Plus size={16} />
-        </button>
+        </Button>
       </div>
 
       {template.description && (
@@ -317,15 +321,18 @@ export function EntityPickerModal() {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-github-border shrink-0">
           <div className="flex items-center gap-3">
-            <Sparkles className="text-accent-blue" size={24} />
-            <h2 className="text-lg font-semibold gradient-text-primary">Entity Library</h2>
+            <Library className="text-accent-blue" size={24} />
+            <h2 className="text-lg font-semibold text-primary">Entity Library</h2>
           </div>
-          <button
+          <Button
             onClick={handleClose}
-            className="p-2 hover:bg-github-elevated rounded-lg transition-colors text-github-text-secondary hover:text-github-text"
+            variant="ghost"
+            size="sm"
+            className="!p-2"
+            aria-label="Close modal"
           >
             <X size={20} />
-          </button>
+          </Button>
         </div>
 
         {flattened && (

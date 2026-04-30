@@ -181,3 +181,4 @@ yarn type-check   # TypeScript check
 - Don't add server-side data fetching (this is a client-only canvas app)
 - Don't break the dark theme aesthetic
 - Don't modify Bezier math without understanding backward-connection handling
+- Don't use raw `<button>`, `<input>`, or `<textarea>` elements — use shared components from `@/components/ui` (see `.github/instructions/UI-COMPONENTS.instructions.md`)

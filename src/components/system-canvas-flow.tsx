@@ -29,11 +29,11 @@ import {
   ConnectionMode,
   PanOnScrollMode,
 } from '@xyflow/react';
-import '@xyflow/react/dist/style.css';
 import { Map, X } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 
 import { useSystemStore } from '@/store';
+import { Button } from '@/components/ui';
 import {
   systemToFlowWithBoundaries,
   flattenedViewToFlow,
@@ -323,14 +323,16 @@ function SystemCanvasInner() {
 
             {/* Mini map with toggle button */}
             <Panel position="bottom-right" className="!m-4 flex flex-col items-end gap-2">
-              <button
+              <Button
                 onClick={() => setShowMinimap(!showMinimap)}
-                className="p-2 bg-github-surface hover:bg-github-elevated border border-github-border rounded-lg shadow-xl text-github-text-secondary hover:text-github-text transition-colors"
+                variant="secondary"
+                size="sm"
+                className="!p-2 shadow-xl"
                 title={showMinimap ? 'Hide Minimap' : 'Show Minimap'}
                 aria-label={showMinimap ? 'Hide Minimap' : 'Show Minimap'}
               >
                 {showMinimap ? <X size={16} /> : <Map size={16} />}
-              </button>
+              </Button>
               {showMinimap && (
                 <MiniMap
                   className="!bg-github-surface !border-github-border !rounded-lg !relative !m-0"

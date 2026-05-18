@@ -5,9 +5,9 @@
  * Renders nodes with input/output handles (ports), function box, and controls.
  */
 
-import { memo, useCallback } from 'react';
-import { Handle, Position, NodeProps } from '@xyflow/react';
-import { Box, Edit2, Maximize2, Trash2 } from 'lucide-react';
+import { memo, useCallback, useState } from 'react';
+import { Handle, Position, NodeProps, NodeResizer } from '@xyflow/react';
+import { Box, Edit2, Maximize2, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 import { useSystemStore } from '@/store';
 import type { SystemFlowNode } from '@/types';
 
@@ -18,7 +18,7 @@ export const SystemNode = memo(function SystemNode({
   positionAbsoluteX,
   positionAbsoluteY,
 }: NodeProps<SystemFlowNode>) {
-  const { openNodeEditor, enterNode, deleteNode, isFlattened } = useSystemStore();
+  const { openNodeEditor, enterNode, deleteNode, reorderNodePort, isFlattened } = useSystemStore();
   
   const flattened = isFlattened();
   // Get inputs/outputs with fallbacks
@@ -27,8 +27,8 @@ export const SystemNode = memo(function SystemNode({
   const { name, process, operand, isExternal } = data;
 
   const wrapperClass = isExternal
-    ? 'w-[220px] bg-github-surface/80 border-2 border-dashed border-github-border rounded-lg shadow-xl flex flex-col select-none'
-    : `w-[220px] bg-github-surface border ${selected ? 'border-accent-blue shadow-glow-blue/30' : 'border-github-border'} rounded-lg shadow-xl flex flex-col select-none`;
+    ? 'w-full h-full bg-github-surface/80 border-2 border-dashed border-github-border rounded-lg shadow-xl flex flex-col select-none'
+    : `w-full h-full bg-github-surface border ${selected ? 'border-accent-blue shadow-glow-blue/30' : 'border-github-border'} rounded-lg shadow-xl flex flex-col select-none`;
 
   const headerClass = isExternal
     ? 'h-[40px] px-3 bg-github-surface/80 border-b-2 border-dashed border-github-border rounded-t-lg flex justify-between items-center'
@@ -50,10 +50,12 @@ export const SystemNode = memo(function SystemNode({
         inputs: inputs,
         outputs: outputs,
         internal: data.internal,
+        width: data.width,
+        height: data.height,
       };
       openNodeEditor(nodeForEdit);
     },
-    [id, name, process, operand, isExternal, data.emergence, data.internal, inputs, outputs, positionAbsoluteX, positionAbsoluteY, openNodeEditor]
+    [id, name, process, operand, isExternal, data.emergence, data.internal, data.width, data.height, inputs, outputs, positionAbsoluteX, positionAbsoluteY, openNodeEditor]
   );
 
   const handleDecompose = useCallback(
@@ -72,8 +74,28 @@ export const SystemNode = memo(function SystemNode({
     [id, deleteNode]
   );
 
+  const [hovered, setHovered] = useState(false);
+
   return (
-    <div className={wrapperClass}>
+    <div
+      className={`${wrapperClass} group/node`}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {/* Resize handle — visible on hover or selected */}
+      {!flattened && (
+        <NodeResizer
+          minWidth={180}
+          minHeight={120}
+          isVisible={hovered || !!selected}
+          lineClassName={selected ? '!border-accent-blue/40' : '!border-github-text-secondary/30'}
+          handleClassName={
+            selected
+              ? '!w-2.5 !h-2.5 !bg-accent-blue !border-2 !border-github-surface !rounded-sm'
+              : '!w-2 !h-2 !bg-github-text-secondary/60 !border-2 !border-github-surface !rounded-sm'
+          }
+        />
+      )}
       {/* Header with drag handle */}
       <div className={`${headerClass} cursor-move`}>
         <div className="flex items-center space-x-2 overflow-hidden">
@@ -128,7 +150,7 @@ export const SystemNode = memo(function SystemNode({
         <span className="text-github-text-secondary font-semibold text-[10px] uppercase tracking-wider leading-tight">
           {process || 'Process'}
         </span>
-        <span className="text-github-text font-bold text-xs tracking-wide truncate leading-tight">
+        <span className="text-github-text font-bold text-xs tracking-wide truncate w-full text-center leading-tight">
           {operand || 'Operand'}
         </span>
       </div>
@@ -140,16 +162,36 @@ export const SystemNode = memo(function SystemNode({
           {inputs.length === 0 && (
             <span className="text-github-text-muted italic text-[10px]">No inputs</span>
           )}
-          {inputs.map((port) => (
-            <div key={port.id} className="flex items-center h-6 relative">
+          {inputs.map((port, idx) => (
+            <div key={port.id} className="flex items-center h-6 relative group/port">
               <Handle
                 type="target"
                 position={Position.Left}
                 id={port.id}
                 className="!w-3 !h-3 !bg-accent-green !border-2 !border-accent-green/70 !rounded-full !-left-[18px]"
               />
+              {!flattened && inputs.length > 1 && (
+                <div className="flex flex-col mr-0.5 -space-y-0.5">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); reorderNodePort(id, 'inputs', idx, 'up'); }}
+                    disabled={idx === 0}
+                    className="text-accent-green/60 hover:text-accent-green hover:bg-accent-green/10 disabled:opacity-20 disabled:pointer-events-none rounded p-px leading-none nodrag transition-colors"
+                    title="Move up"
+                  >
+                    <ChevronUp size={12} />
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); reorderNodePort(id, 'inputs', idx, 'down'); }}
+                    disabled={idx === inputs.length - 1}
+                    className="text-accent-green/60 hover:text-accent-green hover:bg-accent-green/10 disabled:opacity-20 disabled:pointer-events-none rounded p-px leading-none nodrag transition-colors"
+                    title="Move down"
+                  >
+                    <ChevronDown size={12} />
+                  </button>
+                </div>
+              )}
               <span 
-                className={`truncate max-w-[80px] ${isExternal ? 'text-accent-green/50' : 'text-accent-green'}`}
+                className={`truncate ${isExternal ? 'text-accent-green/50' : 'text-accent-green'}`}
                 title={port.name}
               >
                 {port.name}
@@ -166,14 +208,34 @@ export const SystemNode = memo(function SystemNode({
           {outputs.length === 0 && (
             <span className="text-github-text-muted italic text-[10px]">No outputs</span>
           )}
-          {outputs.map((port) => (
-            <div key={port.id} className="flex items-center h-6 relative justify-end">
+          {outputs.map((port, idx) => (
+            <div key={port.id} className="flex items-center h-6 relative justify-end group/port">
               <span 
-                className={`truncate max-w-[80px] ${isExternal ? 'text-accent-pink/50' : 'text-accent-pink'}`}
+                className={`truncate ${isExternal ? 'text-accent-pink/50' : 'text-accent-pink'}`}
                 title={port.name}
               >
                 {port.name}
               </span>
+              {!flattened && outputs.length > 1 && (
+                <div className="flex flex-col ml-0.5 -space-y-0.5">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); reorderNodePort(id, 'outputs', idx, 'up'); }}
+                    disabled={idx === 0}
+                    className="text-accent-pink/60 hover:text-accent-pink hover:bg-accent-pink/10 disabled:opacity-20 disabled:pointer-events-none rounded p-px leading-none nodrag transition-colors"
+                    title="Move up"
+                  >
+                    <ChevronUp size={12} />
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); reorderNodePort(id, 'outputs', idx, 'down'); }}
+                    disabled={idx === outputs.length - 1}
+                    className="text-accent-pink/60 hover:text-accent-pink hover:bg-accent-pink/10 disabled:opacity-20 disabled:pointer-events-none rounded p-px leading-none nodrag transition-colors"
+                    title="Move down"
+                  >
+                    <ChevronDown size={12} />
+                  </button>
+                </div>
+              )}
               <Handle
                 type="source"
                 position={Position.Right}

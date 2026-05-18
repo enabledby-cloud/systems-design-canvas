@@ -19,6 +19,9 @@ export function systemNodeToFlowNode(node: SystemNode): SystemFlowNode {
     id: node.id,
     type: 'system',
     position: { x: node.x, y: node.y },
+    ...(node.width != null || node.height != null
+      ? { style: { width: node.width ?? 220, height: node.height ?? undefined } }
+      : {}),
     data: {
       name: node.name,
       process: node.process,
@@ -28,6 +31,8 @@ export function systemNodeToFlowNode(node: SystemNode): SystemFlowNode {
       inputs: node.inputs || [],
       outputs: node.outputs || [],
       internal: node.internal,
+      width: node.width,
+      height: node.height,
       isNew: node.isNew,
     },
   };
@@ -49,6 +54,8 @@ export function systemEdgeToFlowEdge(edge: SystemEdge): SystemFlowEdge {
       structure: edge.structure,
       sourceHandleId: edge.fromPort,
       targetHandleId: edge.toPort,
+      labelOffsetX: edge.labelOffsetX,
+      labelOffsetY: edge.labelOffsetY,
     },
   };
 }

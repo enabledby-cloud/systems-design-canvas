@@ -162,11 +162,17 @@ function SystemCanvasInner() {
     
     // Only update if the data actually changed
     if (currentKey !== lastSyncedRef.current) {
+      const hadPrevious = lastSyncedRef.current !== '';
       lastSyncedRef.current = currentKey;
       setNodes(flowData.nodes);
       setEdges(flowData.edges);
+
+      // After layout changes (not initial mount), re-fit the viewport
+      if (hadPrevious) {
+        requestAnimationFrame(() => fitView({ padding: 0.2, duration: 300 }));
+      }
     }
-  }, [flowData, setNodes, setEdges]);
+  }, [flowData, setNodes, setEdges, fitView]);
 
   // Handle node position changes (drag)
   const handleNodesChange: OnNodesChange<SystemFlowNode> = useCallback(
@@ -189,6 +195,25 @@ function SystemCanvasInner() {
               if (node) {
                 node.x = change.position.x;
                 node.y = change.position.y;
+              }
+            }
+          }
+        });
+      }
+
+      // Sync dimension changes (resize) back to store
+      const dimensionChanges = changes.filter(
+        (change) => change.type === 'dimensions' && change.dimensions && change.resizing === false
+      );
+
+      if (dimensionChanges.length > 0) {
+        updateCurrentSystem((sys) => {
+          for (const change of dimensionChanges) {
+            if (change.type === 'dimensions' && change.dimensions) {
+              const node = sys.nodes.find((n) => n.id === change.id);
+              if (node) {
+                node.width = change.dimensions.width;
+                node.height = change.dimensions.height;
               }
             }
           }

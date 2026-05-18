@@ -5,7 +5,7 @@
  * Updated to work with React Flow (no canvas ref needed).
  */
 
-import { GitCommit, Plus, Trash2, ArrowLeft, Layers, Save, FolderOpen, Download, Upload, Sparkles, Library } from 'lucide-react';
+import { GitCommit, Plus, Trash2, ArrowLeft, Layers, Save, FolderOpen, Download, Upload, Sparkles, Library, Spline, CornerDownRight, LayoutGrid } from 'lucide-react';
 import { useSystemStore } from '@/store';
 import { Button } from '@/components/ui';
 
@@ -26,6 +26,9 @@ export function TopBar() {
     setIsExportModalOpen,
     setIsImportModalOpen,
     setIsEntityPickerOpen,
+    edgeRouting,
+    setEdgeRouting,
+    autoArrangeNodes,
   } = useSystemStore();
 
   const flattened = isFlattened();
@@ -122,9 +125,33 @@ export function TopBar() {
           </Button>
         </div>
 
+        <div className="h-6 w-px bg-github-border mx-2 hidden lg:block" />
+
+        {/* Edge Routing Toggle */}
+        <div className="hidden lg:flex items-center">
+          <Button
+            onClick={() => setEdgeRouting(edgeRouting === 'smoothstep' ? 'bezier' : 'smoothstep')}
+            variant="secondary"
+            size="sm"
+            icon={edgeRouting === 'smoothstep' ? <CornerDownRight size={16} /> : <Spline size={16} />}
+            title={`Edge routing: ${edgeRouting === 'smoothstep' ? 'Smooth Step' : 'Bezier'} (click to switch)`}
+          >
+            <span className="hidden xl:inline">{edgeRouting === 'smoothstep' ? 'Step' : 'Bezier'}</span>
+          </Button>
+        </div>
+
         {/* Action Buttons (only when not flattened) */}
         {!flattened && (
           <>
+            <Button
+              onClick={autoArrangeNodes}
+              variant="secondary"
+              size="sm"
+              icon={<LayoutGrid size={16} />}
+              title="Auto-arrange all nodes"
+            >
+              <span className="hidden sm:inline">Arrange</span>
+            </Button>
             <Button
               onClick={() => setIsEntityPickerOpen(true)}
               variant="primary"

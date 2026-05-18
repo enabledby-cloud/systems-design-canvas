@@ -60,9 +60,9 @@ export function getBoundsRecursive(
     if (!node) {
       return { minX: 0, minY: 0, maxX: NODE_WIDTH, maxY: 150 };
     }
-    const portCount = Math.max(node.inputs.length, node.outputs.length);
-    const height = NODE_BASE_HEIGHT + portCount * PORT_SPACING;
-    return { minX: 0, minY: 0, maxX: NODE_WIDTH, maxY: height };
+    const width = node.width ?? NODE_WIDTH;
+    const height = node.height ?? (NODE_BASE_HEIGHT + Math.max(node.inputs.length, node.outputs.length) * PORT_SPACING);
+    return { minX: 0, minY: 0, maxX: width, maxY: height };
   }
 
   const node = nodeMap[nodeId];
@@ -126,10 +126,11 @@ export function calculateSystemBoundary(nodes: SystemNode[]): BoundingBox | null
   let maxY = -Infinity;
 
   for (const node of internalNodes) {
+    const nodeWidth = node.width ?? NODE_WIDTH;
+    const nodeHeight = node.height ?? calculateNodeHeight(node.inputs, node.outputs);
     minX = Math.min(minX, node.x);
     minY = Math.min(minY, node.y);
-    maxX = Math.max(maxX, node.x + NODE_WIDTH);
-    const nodeHeight = calculateNodeHeight(node.inputs, node.outputs);
+    maxX = Math.max(maxX, node.x + nodeWidth);
     maxY = Math.max(maxY, node.y + nodeHeight);
   }
 

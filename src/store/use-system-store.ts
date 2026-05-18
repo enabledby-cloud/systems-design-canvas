@@ -16,7 +16,7 @@ import type {
   NodeMap,
   BoundsCache,
 } from '@/types';
-import { generateId, getBoundsRecursive, NODE_WIDTH, NODE_BASE_HEIGHT, PORT_SPACING } from '@/utils';
+import { generateId, getBoundsRecursive, NODE_WIDTH, NODE_BASE_HEIGHT, PORT_SPACING, computeAutoLayout } from '@/utils';
 import { StorageService, type SavedSystemMeta } from '@/utils/storage-service';
 import { initialSystemData } from './initial-data';
 import {
@@ -67,6 +67,7 @@ interface SystemState {
   // View state
   viewDepth: number;
   jsonError: string | null;
+  edgeRouting: 'bezier' | 'smoothstep';
 
   // Modal state
   editingNode: SystemNode | null;
@@ -103,18 +104,21 @@ interface SystemState {
   incrementViewDepth: () => void;
   decrementViewDepth: () => void;
   setJsonError: (error: string | null) => void;
+  setEdgeRouting: (routing: 'bezier' | 'smoothstep') => void;
 
   // Node actions
   setEditingNode: (node: SystemNode | null) => void;
   openNodeEditor: (node?: SystemNode | null) => void;
   saveNode: () => void;
   deleteNode: (nodeId: EntityId) => void;
+  reorderNodePort: (nodeId: EntityId, type: 'inputs' | 'outputs', index: number, direction: 'up' | 'down') => void;
 
   // Edge actions
   setEditingEdge: (edge: SystemEdge | null) => void;
   saveEdge: () => void;
   deleteEditingEdge: () => void;
   createEdge: (edge: Omit<SystemEdge, 'id'>) => void;
+  updateEdgeLabelOffset: (edgeId: EntityId, offsetX: number, offsetY: number) => void;
 
   // Modal actions
   setIsClearModalOpen: (open: boolean) => void;
@@ -140,6 +144,9 @@ interface SystemState {
   markUnsaved: () => void;
   initializeFromStorage: (data: SystemData) => void;
   markAutoSaved: () => void;
+
+  // Layout actions
+  autoArrangeNodes: () => Promise<void>;
 
   // Entity database state
   isEntityPickerOpen: boolean;
@@ -170,6 +177,7 @@ export const useSystemStore = create<SystemState>((set, get) => ({
   currentSaveId: null,
   viewDepth: 0,
   jsonError: null,
+  edgeRouting: 'smoothstep',
   editingNode: null,
   editingEdge: null,
   isClearModalOpen: false,
@@ -392,6 +400,7 @@ export const useSystemStore = create<SystemState>((set, get) => ({
   decrementViewDepth: () =>
     set((state) => ({ viewDepth: Math.max(0, state.viewDepth - 1) })),
   setJsonError: (error) => set({ jsonError: error }),
+  setEdgeRouting: (routing) => set({ edgeRouting: routing }),
 
   // Node actions
   setEditingNode: (node) => set({ editingNode: node }),
@@ -502,6 +511,17 @@ export const useSystemStore = create<SystemState>((set, get) => ({
     });
   },
 
+  reorderNodePort: (nodeId, type, index, direction) => {
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    get().updateCurrentSystem((sys) => {
+      const node = sys.nodes.find((n) => n.id === nodeId);
+      if (!node) return;
+      const ports = node[type];
+      if (newIndex < 0 || newIndex >= ports.length) return;
+      [ports[index], ports[newIndex]] = [ports[newIndex], ports[index]];
+    });
+  },
+
   // Edge actions
   setEditingEdge: (edge) => set({ editingEdge: edge }),
 
@@ -549,8 +569,17 @@ export const useSystemStore = create<SystemState>((set, get) => ({
     });
   },
 
+  updateEdgeLabelOffset: (edgeId, offsetX, offsetY) => {
+    get().updateCurrentSystem((sys) => {
+      const edge = sys.edges.find((e) => e.id === edgeId);
+      if (edge) {
+        edge.labelOffsetX = offsetX;
+        edge.labelOffsetY = offsetY;
+      }
+    });
+  },
+
   // Modal actions
-  setIsClearModalOpen: (open) => set({ isClearModalOpen: open }),
 
   handleClearAll: () => {
     get().updateCurrentSystem((sys) => {
@@ -729,6 +758,25 @@ export const useSystemStore = create<SystemState>((set, get) => ({
   markAutoSaved: () => {
     // Mark as saved to current storage (not library)
     // Don't clear hasUnsavedChanges since it's not saved to library yet
+  },
+
+  // Layout actions
+  autoArrangeNodes: async () => {
+    const currentSystem = get().getCurrentSystem();
+    if (currentSystem.nodes.length === 0) return;
+
+    const positions = await computeAutoLayout(currentSystem.nodes, currentSystem.edges);
+    if (positions.length === 0) return;
+
+    get().updateCurrentSystem((sys) => {
+      for (const pos of positions) {
+        const node = sys.nodes.find((n) => n.id === pos.id);
+        if (node) {
+          node.x = pos.x;
+          node.y = pos.y;
+        }
+      }
+    });
   },
 
   // Entity database actions

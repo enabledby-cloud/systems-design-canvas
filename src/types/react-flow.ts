@@ -16,6 +16,10 @@ export interface SystemNodeData extends Record<string, unknown> {
   inputs: Port[];
   outputs: Port[];
   internal?: InternalSystem;
+  /** Custom width set by user resize */
+  width?: number;
+  /** Custom height set by user resize */
+  height?: number;
   /** Transient flag for newly created nodes */
   isNew?: boolean;
   /** For boundary nodes: 'input' or 'output' */
@@ -40,6 +44,10 @@ export interface SystemEdgeData extends Record<string, unknown> {
   sourceHandleId: string;
   /** Target handle ID */
   targetHandleId: string;
+  /** Custom label offset X from default midpoint */
+  labelOffsetX?: number;
+  /** Custom label offset Y from default midpoint */
+  labelOffsetY?: number;
 }
 
 /** React Flow node with SystemNodeData */

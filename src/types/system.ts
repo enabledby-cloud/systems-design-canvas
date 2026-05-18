@@ -36,6 +36,10 @@ export interface SystemNode {
   inputs: Port[];
   outputs: Port[];
   internal?: InternalSystem;
+  /** Custom width set by user resize (default: 220) */
+  width?: number;
+  /** Custom height set by user resize */
+  height?: number;
   /** Transient flag for newly created nodes, not persisted */
   isNew?: boolean;
 }
@@ -54,6 +58,10 @@ export interface SystemEdge {
   interaction?: string;
   /** Physical medium or structure of the connection */
   structure?: string;
+  /** Custom label offset X from default midpoint (set by dragging) */
+  labelOffsetX?: number;
+  /** Custom label offset Y from default midpoint (set by dragging) */
+  labelOffsetY?: number;
 }
 
 /**

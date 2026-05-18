@@ -1,6 +1,7 @@
 /**
  * Utilities barrel export.
  */
+export * from './auto-layout';
 export * from './canvas-math';
 export * from './flow-converters';
 export * from './storage-service';

@@ -20,7 +20,6 @@ import {
   Server,
   Layers,
   Tag,
-  Sparkles,
   Loader2,
   CheckCircle,
   Library,
@@ -408,7 +407,7 @@ export function EntityPickerModal() {
               <div className="flex-1 overflow-y-auto p-4">
                 {entitySearchQuery && (
                   <div className="mb-4 text-sm text-github-text-secondary">
-                    Found {displayTemplates.length} entit{displayTemplates.length !== 1 ? 'ies' : 'y'} matching "{entitySearchQuery}"
+                    Found {displayTemplates.length} entit{displayTemplates.length !== 1 ? 'ies' : 'y'} matching &quot;{entitySearchQuery}&quot;
                   </div>
                 )}
 
@@ -448,7 +447,7 @@ export function EntityPickerModal() {
               className="absolute left-1/2 -translate-x-1/2 -top-12 flex items-center gap-2 px-4 py-2 bg-accent-green/20 border border-accent-green/40 text-accent-green rounded-lg text-sm font-medium shadow-lg animate-in"
             >
               <CheckCircle size={16} />
-              <span>Added "{addedToast.name}" to canvas</span>
+              <span>Added &quot;{addedToast.name}&quot; to canvas</span>
             </div>
           )}
         </div>

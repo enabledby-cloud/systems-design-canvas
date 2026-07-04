@@ -5,7 +5,7 @@
  * Updated to work with React Flow (no canvas ref needed).
  */
 
-import { GitCommit, Plus, Trash2, ArrowLeft, Layers, Save, FolderOpen, Download, Upload, Sparkles, Library, Spline, CornerDownRight, LayoutGrid } from 'lucide-react';
+import { GitCommit, Plus, Trash2, ArrowLeft, Layers, Save, FolderOpen, Download, Upload, Library, Spline, CornerDownRight, LayoutGrid } from 'lucide-react';
 import { useSystemStore } from '@/store';
 import { Button } from '@/components/ui';
 

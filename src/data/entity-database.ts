@@ -256,7 +256,7 @@ function instantiateInternalSystem(
   }
   
   // Create edges with remapped IDs
-  const edges: SystemEdge[] = template.edges.map((edgeTemplate, idx) => {
+  const edges: SystemEdge[] = template.edges.map((edgeTemplate) => {
     let fromNode: EntityId;
     let fromPort: EntityId;
     let toNode: EntityId;

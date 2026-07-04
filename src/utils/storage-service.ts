@@ -121,6 +121,7 @@ export class StorageService {
    */
   static listSavedSystems(): SavedSystemMeta[] {
     const library = this.getLibrary();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- destructure to drop `data`, keep only metadata
     return library.systems.map(({ data, ...meta }) => meta);
   }
 

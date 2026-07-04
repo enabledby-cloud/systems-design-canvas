@@ -14,6 +14,59 @@ import {
 } from '@xyflow/react';
 import { useSystemStore } from '@/store';
 import type { SystemEdgeProps } from '@/types';
+import type { Point } from '@/types';
+
+/** Builds an SVG path through a sequence of points, rounding interior corners. */
+export function roundedPolylinePath(points: Point[], radius: number): string {
+  if (points.length < 2) return '';
+  if (points.length === 2) {
+    return `M ${points[0].x},${points[0].y} L ${points[1].x},${points[1].y}`;
+  }
+
+  let d = `M ${points[0].x},${points[0].y}`;
+  for (let i = 1; i < points.length - 1; i++) {
+    const prev = points[i - 1];
+    const curr = points[i];
+    const next = points[i + 1];
+
+    const toPrev = { x: prev.x - curr.x, y: prev.y - curr.y };
+    const toNext = { x: next.x - curr.x, y: next.y - curr.y };
+    const distPrev = Math.hypot(toPrev.x, toPrev.y) || 1;
+    const distNext = Math.hypot(toNext.x, toNext.y) || 1;
+    const r = Math.min(radius, distPrev / 2, distNext / 2);
+
+    const cornerStart = { x: curr.x + (toPrev.x / distPrev) * r, y: curr.y + (toPrev.y / distPrev) * r };
+    const cornerEnd = { x: curr.x + (toNext.x / distNext) * r, y: curr.y + (toNext.y / distNext) * r };
+
+    d += ` L ${cornerStart.x},${cornerStart.y} Q ${curr.x},${curr.y} ${cornerEnd.x},${cornerEnd.y}`;
+  }
+  const last = points[points.length - 1];
+  d += ` L ${last.x},${last.y}`;
+  return d;
+}
+
+/** Point at the midpoint (by path length) of a polyline — used to anchor the edge label. */
+export function polylineMidpoint(points: Point[]): Point {
+  const segmentLengths: number[] = [];
+  let total = 0;
+  for (let i = 0; i < points.length - 1; i++) {
+    const len = Math.hypot(points[i + 1].x - points[i].x, points[i + 1].y - points[i].y);
+    segmentLengths.push(len);
+    total += len;
+  }
+  let remaining = total / 2;
+  for (let i = 0; i < segmentLengths.length; i++) {
+    if (remaining <= segmentLengths[i]) {
+      const t = segmentLengths[i] === 0 ? 0 : remaining / segmentLengths[i];
+      return {
+        x: points[i].x + (points[i + 1].x - points[i].x) * t,
+        y: points[i].y + (points[i + 1].y - points[i].y) * t,
+      };
+    }
+    remaining -= segmentLengths[i];
+  }
+  return points[points.length - 1];
+}
 
 export const SystemEdge = memo(function SystemEdge({
   id,
@@ -38,7 +91,16 @@ export const SystemEdge = memo(function SystemEdge({
   let labelX: number;
   let labelY: number;
 
-  if (edgeRouting === 'smoothstep') {
+  if (data?.waypoints && data.waypoints.length > 0) {
+    // Route through ELK's obstacle-avoiding bend points from the last auto-arrange.
+    // Endpoints come from React Flow's own measured handle positions (always correct);
+    // only the intermediate route comes from ELK.
+    const points: Point[] = [{ x: sourceX, y: sourceY }, ...data.waypoints, { x: targetX, y: targetY }];
+    edgePath = roundedPolylinePath(points, 16);
+    const mid = polylineMidpoint(points);
+    labelX = mid.x;
+    labelY = mid.y;
+  } else if (edgeRouting === 'smoothstep') {
     [edgePath, labelX, labelY] = getSmoothStepPath({
       sourceX,
       sourceY,

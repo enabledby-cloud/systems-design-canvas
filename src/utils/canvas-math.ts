@@ -91,7 +91,7 @@ export function getBoundsRecursive(
   const portCount = Math.max(node.inputs.length, node.outputs.length);
   const minHeightForPorts = 40 + portCount * PORT_SPACING + 16;
 
-  let computedMinY = minY - 48;
+  const computedMinY = minY - 48;
   let computedMaxY = maxY + 24;
   if (computedMaxY - computedMinY < minHeightForPorts) {
     computedMaxY = computedMinY + minHeightForPorts;

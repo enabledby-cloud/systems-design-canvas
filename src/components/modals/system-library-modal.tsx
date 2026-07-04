@@ -20,7 +20,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useSystemStore } from '@/store';
-import { StorageService, type SavedSystemMeta } from '@/utils/storage-service';
+import { StorageService } from '@/utils/storage-service';
 import { useEscapeKey } from '@/utils/use-escape-key';
 import { Button } from '@/components/ui';
 

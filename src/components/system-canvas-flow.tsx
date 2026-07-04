@@ -13,7 +13,6 @@ import {
   MiniMap,
   useNodesState,
   useEdgesState,
-  addEdge,
   Connection,
   NodeChange,
   EdgeChange,
@@ -37,7 +36,6 @@ import { Button } from '@/components/ui';
 import {
   systemToFlowWithBoundaries,
   flattenedViewToFlow,
-  generateId,
   useAutoSave,
 } from '@/utils';
 import { SystemNode } from './flow/system-node';
@@ -80,7 +78,7 @@ const defaultEdgeOptions = {
 
 function SystemCanvasInner() {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
-  const { screenToFlowPosition, fitView } = useReactFlow();
+  const { fitView } = useReactFlow();
   
   // Minimap visibility state
   const [showMinimap, setShowMinimap] = useState(true);
@@ -91,6 +89,7 @@ function SystemCanvasInner() {
     viewDepth,
     currentPath,
     hasUnsavedChanges,
+    edgeWaypoints,
     getCurrentSystem,
     isFlattened,
     getFlattenedView,
@@ -106,6 +105,7 @@ function SystemCanvasInner() {
       viewDepth: state.viewDepth,
       currentPath: state.currentPath,
       hasUnsavedChanges: state.hasUnsavedChanges,
+      edgeWaypoints: state.edgeWaypoints,
       getCurrentSystem: state.getCurrentSystem,
       isFlattened: state.isFlattened,
       getFlattenedView: state.getFlattenedView,
@@ -132,7 +132,6 @@ function SystemCanvasInner() {
   }, [refreshSavedSystems]);
 
   const flattened = isFlattened();
-  const parentNode = getParentNode();
 
   // Convert system data to React Flow format
   const flowData = useMemo(() => {
@@ -146,8 +145,8 @@ function SystemCanvasInner() {
     }
     
     // Use boundary-aware converter when inside a subsystem
-    return systemToFlowWithBoundaries(currentSystem, parent);
-  }, [systemData, viewDepth, currentPath, flattened, getCurrentSystem, getFlattenedView, getParentNode]);
+    return systemToFlowWithBoundaries(currentSystem, parent, edgeWaypoints);
+  }, [systemData, viewDepth, currentPath, flattened, edgeWaypoints, getCurrentSystem, getFlattenedView, getParentNode]);
 
   // React Flow state - initialize from flowData
   const [nodes, setNodes, onNodesChange] = useNodesState<SystemFlowNode>(flowData.nodes);

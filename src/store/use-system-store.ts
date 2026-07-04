@@ -15,8 +15,9 @@ import type {
   EntityId,
   NodeMap,
   BoundsCache,
+  Point,
 } from '@/types';
-import { generateId, getBoundsRecursive, NODE_WIDTH, NODE_BASE_HEIGHT, PORT_SPACING, computeAutoLayout } from '@/utils';
+import { generateId, getBoundsRecursive, computeAutoLayout } from '@/utils';
 import { StorageService, type SavedSystemMeta } from '@/utils/storage-service';
 import { initialSystemData } from './initial-data';
 import {
@@ -68,6 +69,8 @@ interface SystemState {
   viewDepth: number;
   jsonError: string | null;
   edgeRouting: 'bezier' | 'smoothstep';
+  /** Obstacle-avoiding edge routes from the last auto-arrange, keyed by edge id. Transient — not persisted. */
+  edgeWaypoints: Record<EntityId, Point[]>;
 
   // Modal state
   editingNode: SystemNode | null;
@@ -178,6 +181,7 @@ export const useSystemStore = create<SystemState>((set, get) => ({
   viewDepth: 0,
   jsonError: null,
   edgeRouting: 'smoothstep',
+  edgeWaypoints: {},
   editingNode: null,
   editingEdge: null,
   isClearModalOpen: false,
@@ -354,7 +358,7 @@ export const useSystemStore = create<SystemState>((set, get) => ({
   },
 
   // System data actions
-  setSystemData: (data) => set({ systemData: data, jsonError: null, hasUnsavedChanges: true }),
+  setSystemData: (data) => set({ systemData: data, jsonError: null, hasUnsavedChanges: true, edgeWaypoints: {} }),
 
   updateCurrentSystem: (updater) => {
     const { systemData, currentPath } = get();
@@ -369,7 +373,9 @@ export const useSystemStore = create<SystemState>((set, get) => ({
     }
 
     updater(current);
-    set({ systemData: newState, hasUnsavedChanges: true });
+    // Any manual edit invalidates previously computed edge routes (auto-arrange
+    // re-populates them right after calling this, so this is safe there too).
+    set({ systemData: newState, hasUnsavedChanges: true, edgeWaypoints: {} });
   },
 
   // Navigation actions
@@ -378,6 +384,7 @@ export const useSystemStore = create<SystemState>((set, get) => ({
     set({
       currentPath: [...currentPath, nodeId],
       viewDepth: 0,
+      edgeWaypoints: {},
     });
   },
 
@@ -386,6 +393,7 @@ export const useSystemStore = create<SystemState>((set, get) => ({
     set({
       currentPath: currentPath.slice(0, index),
       viewDepth: 0,
+      edgeWaypoints: {},
     });
   },
 
@@ -580,6 +588,7 @@ export const useSystemStore = create<SystemState>((set, get) => ({
   },
 
   // Modal actions
+  setIsClearModalOpen: (open) => set({ isClearModalOpen: open }),
 
   handleClearAll: () => {
     get().updateCurrentSystem((sys) => {
@@ -641,6 +650,7 @@ export const useSystemStore = create<SystemState>((set, get) => ({
       systemData: newState,
       renameModal: { isOpen: false, name: '', emergence: '' },
       hasUnsavedChanges: true,
+      edgeWaypoints: {},
     });
   },
 
@@ -686,6 +696,7 @@ export const useSystemStore = create<SystemState>((set, get) => ({
         hasUnsavedChanges: false,
         lastSavedAt: savedSystem.updatedAt,
         jsonError: null,
+        edgeWaypoints: {},
       });
     }
   },
@@ -716,6 +727,7 @@ export const useSystemStore = create<SystemState>((set, get) => ({
       hasUnsavedChanges: false,
       lastSavedAt: null,
       jsonError: null,
+      edgeWaypoints: {},
     });
   },
 
@@ -729,6 +741,7 @@ export const useSystemStore = create<SystemState>((set, get) => ({
       hasUnsavedChanges: false,
       lastSavedAt: null,
       jsonError: null,
+      edgeWaypoints: {},
     });
   },
 
@@ -752,6 +765,7 @@ export const useSystemStore = create<SystemState>((set, get) => ({
       hasUnsavedChanges: false,
       lastSavedAt: null,
       jsonError: null,
+      edgeWaypoints: {},
     });
   },
 
@@ -765,7 +779,7 @@ export const useSystemStore = create<SystemState>((set, get) => ({
     const currentSystem = get().getCurrentSystem();
     if (currentSystem.nodes.length === 0) return;
 
-    const positions = await computeAutoLayout(currentSystem.nodes, currentSystem.edges);
+    const { positions, edgeWaypoints } = await computeAutoLayout(currentSystem.nodes, currentSystem.edges);
     if (positions.length === 0) return;
 
     get().updateCurrentSystem((sys) => {
@@ -777,6 +791,9 @@ export const useSystemStore = create<SystemState>((set, get) => ({
         }
       }
     });
+    // updateCurrentSystem clears edgeWaypoints as a side effect; repopulate
+    // with the routes computed for the positions we just applied.
+    set({ edgeWaypoints });
   },
 
   // Entity database actions

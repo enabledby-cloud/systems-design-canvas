@@ -9,6 +9,8 @@ import type {
   InternalSystem,
   SystemFlowNode,
   SystemFlowEdge,
+  EntityId,
+  Point,
 } from '@/types';
 
 /**
@@ -41,7 +43,7 @@ export function systemNodeToFlowNode(node: SystemNode): SystemFlowNode {
 /**
  * Converts a SystemEdge to a React Flow Edge.
  */
-export function systemEdgeToFlowEdge(edge: SystemEdge): SystemFlowEdge {
+export function systemEdgeToFlowEdge(edge: SystemEdge, waypoints?: Point[]): SystemFlowEdge {
   return {
     id: edge.id,
     type: 'system',
@@ -56,6 +58,7 @@ export function systemEdgeToFlowEdge(edge: SystemEdge): SystemFlowEdge {
       targetHandleId: edge.toPort,
       labelOffsetX: edge.labelOffsetX,
       labelOffsetY: edge.labelOffsetY,
+      waypoints,
     },
   };
 }
@@ -66,13 +69,14 @@ export function systemEdgeToFlowEdge(edge: SystemEdge): SystemFlowEdge {
  */
 export function systemToFlowWithBoundaries(
   system: InternalSystem,
-  parentNode: SystemNode | null
+  parentNode: SystemNode | null,
+  edgeWaypoints: Record<EntityId, Point[]> = {}
 ): {
   nodes: SystemFlowNode[];
   edges: SystemFlowEdge[];
 } {
   const systemNodes = system.nodes.map(systemNodeToFlowNode);
-  const systemEdges = system.edges.map(systemEdgeToFlowEdge);
+  const systemEdges = system.edges.map((e) => systemEdgeToFlowEdge(e, edgeWaypoints[e.id]));
 
   if (!parentNode) {
     return { nodes: systemNodes, edges: systemEdges };
@@ -176,8 +180,8 @@ export function flattenedViewToFlow(flattenedView: {
     zIndex: -1,
   }));
   
-  // Convert edges
-  const edges = flattenedView.resolvedEdges.map(systemEdgeToFlowEdge);
+  // Convert edges (no waypoints in flattened view — arrange is unavailable there)
+  const edges = flattenedView.resolvedEdges.map((e) => systemEdgeToFlowEdge(e));
   
   // Groups first (lower z-index), then regular nodes on top
   return {

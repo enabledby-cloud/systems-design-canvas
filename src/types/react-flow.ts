@@ -4,7 +4,7 @@
  */
 
 import type { Node, Edge, NodeProps, EdgeProps } from '@xyflow/react';
-import type { Port, EntityId, InternalSystem } from './system';
+import type { Port, InternalSystem, Point } from './system';
 
 /** Data stored in a React Flow node for system entities */
 export interface SystemNodeData extends Record<string, unknown> {
@@ -48,6 +48,8 @@ export interface SystemEdgeData extends Record<string, unknown> {
   labelOffsetX?: number;
   /** Custom label offset Y from default midpoint */
   labelOffsetY?: number;
+  /** Transient obstacle-avoiding route from auto-layout; cleared on manual edit */
+  waypoints?: Point[];
 }
 
 /** React Flow node with SystemNodeData */
